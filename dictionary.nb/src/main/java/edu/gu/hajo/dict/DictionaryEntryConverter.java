@@ -3,6 +3,7 @@ package edu.gu.hajo.dict;
 import java.util.Arrays;
 
 import edu.gu.hajo.dict.core.DictionaryEntry;
+import java.util.List;
 
 /**
  * Utility to convert from/to strings 
@@ -29,7 +30,22 @@ class DictionaryEntryConverter {
 
     // The inverse, not implemented, not needed.
     public static String toString(DictionaryEntry e) {
-        return null;
+        List<String> translations = e.getTranslations();
+        String word = e.getSource();
+        
+        StringBuilder sb = new StringBuilder(word);
+        sb.append("=");
+        boolean first = true;
+        for (String translation : translations) {
+            if (!first) {
+                sb.append(",");
+            } else {
+                first = false;
+            }
+            sb.append(translation);
+            
+        }
+        return sb.toString();
     }
 
 }

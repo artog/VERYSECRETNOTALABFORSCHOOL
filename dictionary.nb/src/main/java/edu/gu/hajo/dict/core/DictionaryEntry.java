@@ -1,5 +1,6 @@
 package edu.gu.hajo.dict.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,13 +15,20 @@ public final class DictionaryEntry  {
 
 	public DictionaryEntry(String source, List<String> translations) {
 		this.source = source;
-		this.translations = translations;
+                List<String> t = new ArrayList();
+                t.addAll(translations);
+		this.translations = t;
 	}
 	
 	public String getSource() {
 		return source;
 	}
         
+        public List<String> getTranslations() {
+            List<String> copy = new ArrayList();
+            copy.addAll(this.translations);
+            return copy;
+        }
 	// This is good for debug
 	@Override
 	public String toString() {

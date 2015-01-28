@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="1" time="0.003" errors="0" skipped="0" tests="1" name="edu.gu.hajo.dict.TestDictionaryFactory">
+<testsuite failures="1" time="0.046" errors="0" skipped="0" tests="3" name="edu.gu.hajo.dict.core.DictionaryEntryTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.7.0_45\jre\bin"/>
@@ -15,6 +15,7 @@
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value="Service Pack 1"/>
+    <property name="test" value="edu.gu.hajo.dict.core.DictionaryEntryTest"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="user.dir" value="F:\School\DIT950\VERYSECRETNOTALABFORSCHOOL\dictionary.nb"/>
     <property name="java.runtime.version" value="1.7.0_45-b18"/>
@@ -27,14 +28,13 @@
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="user.variant" value=""/>
     <property name="os.name" value="Windows 7"/>
-    <property name="maven.ext.class.path" value="C:\Program Files\NetBeans 8.0.2\java\maven-nblib\netbeans-eventspy.jar"/>
+    <property name="maven.ext.class.path" value="C:\Program Files\NetBeans 8.0.2\java\maven-nblib\netbeans-eventspy.jar;C:\Program Files\NetBeans 8.0.2\java\maven-nblib\netbeans-cos.jar"/>
     <property name="classworlds.conf" value="C:\Program Files\NetBeans 8.0.2\java\maven\bin\m2.conf"/>
     <property name="sun.jnu.encoding" value="Cp1252"/>
     <property name="java.library.path" value="C:\Program Files\Java\jdk1.7.0_45\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;C:\ProgramData\Oracle\Java\javapath;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Python34\;C:\Python34\Scripts;C:\Program Files (x86)\Haskell\bin;C:\Program Files (x86)\Haskell Platform\2013.2.0.0\lib\extralibs\bin;C:\Program Files (x86)\Haskell Platform\2013.2.0.0\bin;C:\Ruby200-x64\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Git\cmd;C:\Program Files\Microsoft SQL Server\110\Tools\Binn\;C:\Program Files (x86)\Haskell Platform\2013.2.0.0\mingw\bin;C:\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\Program Files\MATLAB\R2014b\runtime\win64;C:\Program Files\MATLAB\R2014b\bin;C:\Program Files\Java\jdk1.7.0_45\bin;C:\Users\Adam\AppData\Roaming\cabal\bin;."/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="51.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="skipTests" value="false"/>
     <property name="os.version" value="6.1"/>
     <property name="user.home" value="C:\Users\Adam"/>
     <property name="user.timezone" value="Europe/Berlin"/>
@@ -46,7 +46,7 @@
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="C:\Program Files\Java\jdk1.7.0_45\jre"/>
-    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -DskipTests=false -Dmaven.ext.class.path=C:\Program Files\NetBeans 8.0.2\java\maven-nblib\netbeans-eventspy.jar -Dfile.encoding=UTF-8 clean verify"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -Dtest=edu.gu.hajo.dict.core.DictionaryEntryTest -Dmaven.ext.class.path=C:\Program Files\NetBeans 8.0.2\java\maven-nblib\netbeans-eventspy.jar;C:\Program Files\NetBeans 8.0.2\java\maven-nblib\netbeans-cos.jar -Dfile.encoding=UTF-8 surefire:test"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
     <property name="user.language.format" value="sv"/>
@@ -64,12 +64,13 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase time="0.001" classname="edu.gu.hajo.dict.TestDictionaryFactory" name="testGetLanguages">
-    <failure type="java.lang.AssertionError:">java.lang.AssertionError: 
-	at org.junit.Assert.fail(Assert.java:91)
-	at org.junit.Assert.assertTrue(Assert.java:43)
-	at org.junit.Assert.assertTrue(Assert.java:54)
-	at edu.gu.hajo.dict.TestDictionaryFactory.testGetLanguages(TestDictionaryFactory.java:19)
+  <testcase time="0.002" classname="edu.gu.hajo.dict.core.DictionaryEntryTest" name="testGetTranslations"/>
+  <testcase time="0" classname="edu.gu.hajo.dict.core.DictionaryEntryTest" name="testGetSource"/>
+  <testcase time="0.004" classname="edu.gu.hajo.dict.core.DictionaryEntryTest" name="testToString">
+    <failure message="expected:&lt;...ranslations=[aaa, aa[b, aa]c]]&gt; but was:&lt;...ranslations=[aaa, aa[]c]]&gt;" type="org.junit.ComparisonFailure">org.junit.ComparisonFailure: expected:&lt;...ranslations=[aaa, aa[b, aa]c]]&gt; but was:&lt;...ranslations=[aaa, aa[]c]]&gt;
+	at org.junit.Assert.assertEquals(Assert.java:123)
+	at org.junit.Assert.assertEquals(Assert.java:145)
+	at edu.gu.hajo.dict.core.DictionaryEntryTest.testToString(DictionaryEntryTest.java:66)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
