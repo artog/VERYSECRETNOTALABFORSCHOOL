@@ -1,11 +1,18 @@
 package edu.gu.hajo.dict;
 
+import edu.gu.hajo.dict.core.Dictionary;
+import edu.gu.hajo.dict.core.DictionaryEntry;
 import java.io.IOException;
 import java.net.URI;
 import edu.gu.hajo.dict.core.IDictionary;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.dict.io.DictionaryReader;
+import edu.gu.hajo.trie.ConnectableTrie;
+import edu.gu.hajo.trie.Connector;
+import edu.gu.hajo.trie.IConnectableTrie;
+import edu.gu.hajo.trie.TrieNode;
 import java.io.File;
+import java.util.List;
 
 /**
  * A Factory for dictionaries
@@ -16,7 +23,21 @@ import java.io.File;
 public final class DictionaryFactory {
 
     public static IDictionary getDictionary(URI uri) throws IOException {
-       return null;
+        List<String> words = DictionaryReader.INSTANCE.open(uri);
+       
+        IConnectableTrie source = ConnectableTrie.newInstance();
+        IConnectableTrie target = ConnectableTrie.newInstance();
+       
+        for(String i : words){
+            DictionaryEntry entry = DictionaryEntryConverter.toObject(i);
+           
+            Connector connector = source.insert(entry.getSource());
+            for(String translations : entry.getTranslations()){
+                connector.connect(target.insert(translations));
+            }   
+        }
+
+       return new Dictionary(source, target);
     }
 
     public static URI getDictionaryUri(String dictionaryPath, Language from, Language to) {

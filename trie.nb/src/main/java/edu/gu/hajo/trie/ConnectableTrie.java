@@ -19,14 +19,14 @@ public class ConnectableTrie implements IConnectableTrie {
     // The node structure of ConnectableTrie is final so you can't modify
     // or remove any nodes from it, only add new nodes;
     @Override
-    public TrieNode insert(String key) {
+    public Connector insert(String key) {
         TrieNode node = root;
 
         for (char i : key.toCharArray()) {
             node = node.addChild(i);
         }
         node.setEndOfWord();
-        return node;
+        return new Connector(node);
     }
 
     @Override

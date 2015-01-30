@@ -15,6 +15,7 @@ import edu.gu.hajo.dict.core.Dictionary;
 import edu.gu.hajo.dict.core.IDictionary;
 import edu.gu.hajo.dict.io.DictionaryReader;
 import edu.gu.hajo.trie.ConnectableTrie;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -35,9 +36,7 @@ public class TestDictionary {
 
         Dictionary d = new Dictionary(ConnectableTrie.newInstance(), ConnectableTrie.newInstance());
      
-        // TODO 
-        
-        
+        // TODO
     }
 
     @Test
@@ -45,15 +44,14 @@ public class TestDictionary {
             MalformedURLException, IOException {
         IDictionary d = DictionaryFactory.getDictionary(sv2en);
 
-        // TODO
+        assertTrue(d.getTranslations("").isEmpty());
     }
 
     @Test
     public void testGetMatchesForAWordInFile() throws URISyntaxException,
             MalformedURLException, IOException {
         IDictionary d = DictionaryFactory.getDictionary(sv2en);
-       
+
         // TODO
-       
     }
 }

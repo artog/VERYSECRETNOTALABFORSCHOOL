@@ -20,14 +20,14 @@ public class TestConnectableTrie {
     @Test
     public void testInsertEmpty() {
         IConnectableTrie t = ConnectableTrie.newInstance();
-        TrieNode c = t.insert("");
+        Connector c = t.insert("");
         assertTrue(c != null);
     }
 
     @Test
     public void testInsert() {
         IConnectableTrie t = ConnectableTrie.newInstance();
-        TrieNode c = t.insert("abc");
+        Connector c = t.insert("abc");
         assertTrue(c != null);
     }
 
@@ -104,13 +104,13 @@ public class TestConnectableTrie {
         IConnectableTrie k = ConnectableTrie.newInstance();
         IConnectableTrie v = ConnectableTrie.newInstance();
 
-        TrieNode ck = k.insert("");
-        TrieNode cv1 = v.insert("v1");
-        TrieNode cv2 = v.insert("v2");
-        TrieNode cv3 = v.insert("v3");
-        ck.addPeer(cv1);
-        ck.addPeer(cv2);
-        ck.addPeer(cv3);
+        Connector ck = k.insert("");
+        Connector cv1 = v.insert("v1");
+        Connector cv2 = v.insert("v2");
+        Connector cv3 = v.insert("v3");
+        ck.connect(cv1);
+        ck.connect(cv2);
+        ck.connect(cv3);
 
         List<String> vs = k.getValues(""); // Will get all
         assertTrue(vs != null && vs.size() == 3);
@@ -121,17 +121,17 @@ public class TestConnectableTrie {
         IConnectableTrie k = ConnectableTrie.newInstance();
         IConnectableTrie v = ConnectableTrie.newInstance();
         // The keys
-        TrieNode ck1 = k.insert("aaa");
-        TrieNode ck2 = k.insert("aab");
-        TrieNode ck3 = k.insert("abc");
+        Connector ck1 = k.insert("aaa");
+        Connector ck2 = k.insert("aab");
+        Connector ck3 = k.insert("abc");
         // The values
-        TrieNode cv1 = v.insert("");
-        TrieNode cv2 = v.insert("");
-        TrieNode cv3 = v.insert("");
+        Connector cv1 = v.insert("");
+        Connector cv2 = v.insert("");
+        Connector cv3 = v.insert("");
 
-        ck1.addPeer(cv1);
-        ck2.addPeer(cv2);
-        ck3.addPeer(cv3);
+        ck1.connect(cv1);
+        ck2.connect(cv2);
+        ck3.connect(cv3);
 
         // Checking different prefix's
         List<String> ks = k.getKeys("aaa");
@@ -149,17 +149,17 @@ public class TestConnectableTrie {
         IConnectableTrie k = ConnectableTrie.newInstance();
         IConnectableTrie v = ConnectableTrie.newInstance();
         // The keys
-        TrieNode ck1 = k.insert("aaa");
-        TrieNode ck2 = k.insert("aab");
-        TrieNode ck3 = k.insert("abc");
+        Connector ck1 = k.insert("aaa");
+        Connector ck2 = k.insert("aab");
+        Connector ck3 = k.insert("abc");
         // The values
-        TrieNode cv1 = v.insert("AAA");
-        TrieNode cv2 = v.insert("AAB");
-        TrieNode cv3 = v.insert("ABC");
+        Connector cv1 = v.insert("AAA");
+        Connector cv2 = v.insert("AAB");
+        Connector cv3 = v.insert("ABC");
 
-        ck1.addPeer(cv1);
-        ck2.addPeer(cv2);
-        ck3.addPeer(cv3);
+        ck1.connect(cv1);
+        ck2.connect(cv2);
+        ck3.connect(cv3);
 
         // Get all keys starting with 'a'
         List<String> ks = k.getKeys("a");
