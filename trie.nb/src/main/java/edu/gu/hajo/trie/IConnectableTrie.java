@@ -5,7 +5,7 @@ import java.util.List;
 public interface IConnectableTrie {
 
     // Add a word to Trie, return node containing last char in key    
-    public abstract TrieNode insert(String key);
+    public abstract Connector insert(String key);
 
     // Get all keys starting with prefix
     public abstract List<String> getKeys(String prefix);

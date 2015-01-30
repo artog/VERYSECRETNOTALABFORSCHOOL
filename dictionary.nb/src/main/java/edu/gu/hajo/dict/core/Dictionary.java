@@ -25,12 +25,12 @@ public class Dictionary implements IDictionary {
 
     @Override
     public List<String> getTranslations(String key) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return source.getValues(key);
     }
 
     @Override
     public List<String> getKeys(String prefix) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return source.getKeys(prefix);
     }
 
 }
