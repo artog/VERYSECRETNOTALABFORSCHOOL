@@ -49,7 +49,8 @@ public class DictionaryEntryTest {
         list.remove(1);
         
         List<String> result = instance.getTranslations();
-        assertTrue(result.size() == 2 && "aab".equals(result.get(1)));
+        assertTrue(result.size() == 3);
+        assertTrue("aab".equals(result.get(1)));
     }
 
     /**
