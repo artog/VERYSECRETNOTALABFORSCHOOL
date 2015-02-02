@@ -15,5 +15,5 @@ public interface IDictionary {
     
     public List<String> getKeys(String prefix);
     
-    
+    public List<DictionaryEntry> getEntries(String prefix);
 }

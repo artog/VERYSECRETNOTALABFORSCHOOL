@@ -6,8 +6,11 @@ import java.util.List;
 /*
  *  Nodes in Trie
  *  Note: Package private class
+ *@startuml
+ * TrieNode <-- ConnectableTrie
+ *@enduml
  */
-public class TrieNode {
+class TrieNode {
 
     private boolean endOfWord;
     public final char element;

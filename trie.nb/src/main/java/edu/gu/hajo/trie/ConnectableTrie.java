@@ -3,18 +3,15 @@ package edu.gu.hajo.trie;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnectableTrie implements IConnectableTrie {
+class ConnectableTrie implements IConnectableTrie {
 
     private final TrieNode root;
 
-    private ConnectableTrie() {
+    ConnectableTrie() {
         root = new TrieNode(null, TrieNode.ROOT);
     }
 
-    // Factory method
-    public static IConnectableTrie newInstance() {
-        return new ConnectableTrie();
-    }
+    
 
     // The node structure of ConnectableTrie is final so you can't modify
     // or remove any nodes from it, only add new nodes;

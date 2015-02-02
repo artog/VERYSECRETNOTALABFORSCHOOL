@@ -1,6 +1,7 @@
 package edu.gu.hajo.dict.core;
 
 import edu.gu.hajo.trie.IConnectableTrie;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +32,23 @@ public class Dictionary implements IDictionary {
     @Override
     public List<String> getKeys(String prefix) {
         return source.getKeys(prefix);
+    }
+    
+    @Override
+    public List<DictionaryEntry> getEntries(String prefix) {
+        List<String> keys = source.getKeys(prefix);
+        List<DictionaryEntry> ret = new ArrayList();
+        
+        for (String key : keys) {
+            ret.add(
+                new DictionaryEntry(
+                        key,
+                        this.getTranslations(key)
+                )
+            );
+        } 
+        
+        return ret;
     }
 
 }

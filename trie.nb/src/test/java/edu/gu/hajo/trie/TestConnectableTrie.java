@@ -13,39 +13,39 @@ public class TestConnectableTrie {
     
     @Test(expected = NullPointerException.class)
     public void testInsertNull() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         t.insert(null);
     }
 
     @Test
     public void testInsertEmpty() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         Connector c = t.insert("");
         assertTrue(c != null);
     }
 
     @Test
     public void testInsert() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         Connector c = t.insert("abc");
         assertTrue(c != null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testContainsNull() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         t.contains(null);
     }
 
     @Test
     public void testContainsEmpty() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         assertFalse(t.contains(""));
     }
 
     @Test
     public void testInsertAndContains() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         t.insert("aaa");
         t.insert("aab");
         t.insert("abc");
@@ -60,40 +60,40 @@ public class TestConnectableTrie {
 
     @Test(expected = NullPointerException.class)
     public void testGetKeysForNull() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         t.getKeys(null);
     }
 
     @Test
     public void testGetKeysForEmpty() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         List<String> ks = t.getKeys("");
         assertTrue(ks != null && ks.size() == 0);
     }
 
     @Test
     public void testGetKeys() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         List<String> ks = t.getKeys("abcdefghi");
         assertTrue(ks != null && ks.isEmpty());
     }
 
     @Test(expected = NullPointerException.class)
     public void testGetValuesForNull() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         t.getKeys(null);
     }
 
     @Test
     public void testGetValuesForEmpty() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         List<String> vs = t.getKeys("");
         assertTrue(vs != null && vs.isEmpty());
     }
 
     @Test
     public void testGetValues() {
-        IConnectableTrie t = ConnectableTrie.newInstance();
+        IConnectableTrie t = ConnectableTrieFactory.newInstance();
         List<String> vs = t.getKeys("abcdefghij");
         assertTrue(vs != null && vs.isEmpty());
     }
@@ -101,8 +101,8 @@ public class TestConnectableTrie {
     // ----- Testing addPeered tries --------
     @Test
     public void testInsertKeysAndValuesAndGetAllValues() {
-        IConnectableTrie k = ConnectableTrie.newInstance();
-        IConnectableTrie v = ConnectableTrie.newInstance();
+        IConnectableTrie k = ConnectableTrieFactory.newInstance();
+        IConnectableTrie v = ConnectableTrieFactory.newInstance();
 
         Connector ck = k.insert("");
         Connector cv1 = v.insert("v1");
@@ -118,8 +118,8 @@ public class TestConnectableTrie {
 
     @Test
     public void testInsertKeysAndCheckPrefix() {
-        IConnectableTrie k = ConnectableTrie.newInstance();
-        IConnectableTrie v = ConnectableTrie.newInstance();
+        IConnectableTrie k = ConnectableTrieFactory.newInstance();
+        IConnectableTrie v = ConnectableTrieFactory.newInstance();
         // The keys
         Connector ck1 = k.insert("aaa");
         Connector ck2 = k.insert("aab");
@@ -146,8 +146,8 @@ public class TestConnectableTrie {
 
     @Test
     public void testGetValuesForKeys() {
-        IConnectableTrie k = ConnectableTrie.newInstance();
-        IConnectableTrie v = ConnectableTrie.newInstance();
+        IConnectableTrie k = ConnectableTrieFactory.newInstance();
+        IConnectableTrie v = ConnectableTrieFactory.newInstance();
         // The keys
         Connector ck1 = k.insert("aaa");
         Connector ck2 = k.insert("aab");

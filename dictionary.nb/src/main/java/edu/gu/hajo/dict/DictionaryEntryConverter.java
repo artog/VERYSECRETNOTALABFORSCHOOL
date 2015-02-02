@@ -24,7 +24,9 @@ class DictionaryEntryConverter {
         // To problematic wich  swedish chars
         String[] splitLine = s.split(wSepChar);
         String word = splitLine[0].trim();
-        String[] trans = splitLine[1].trim().split(tSepChar);
+        String trimmed = splitLine[1].replaceAll("\\s","");
+        String[] trans = trimmed.split(tSepChar);
+        
         return new DictionaryEntry(word, Arrays.asList(trans));
     }
 

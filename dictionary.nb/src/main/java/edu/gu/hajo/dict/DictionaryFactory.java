@@ -7,10 +7,9 @@ import java.net.URI;
 import edu.gu.hajo.dict.core.IDictionary;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.dict.io.DictionaryReader;
-import edu.gu.hajo.trie.ConnectableTrie;
+import edu.gu.hajo.trie.ConnectableTrieFactory;
 import edu.gu.hajo.trie.Connector;
 import edu.gu.hajo.trie.IConnectableTrie;
-import edu.gu.hajo.trie.TrieNode;
 import java.io.File;
 import java.util.List;
 
@@ -25,8 +24,8 @@ public final class DictionaryFactory {
     public static IDictionary getDictionary(URI uri) throws IOException {
         List<String> words = DictionaryReader.INSTANCE.open(uri);
        
-        IConnectableTrie source = ConnectableTrie.newInstance();
-        IConnectableTrie target = ConnectableTrie.newInstance();
+        IConnectableTrie source = ConnectableTrieFactory.newInstance();
+        IConnectableTrie target = ConnectableTrieFactory.newInstance();
        
         for(String i : words){
             DictionaryEntry entry = DictionaryEntryConverter.toObject(i);
