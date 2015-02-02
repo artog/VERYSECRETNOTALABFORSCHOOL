@@ -10,10 +10,6 @@ import java.util.List;
  */
 public interface IDictionary {
 
-	// What method(s) would the translator like to have???
-    public List<String> getTranslations(String key);
-    
-    public List<String> getKeys(String prefix);
-    
     public List<DictionaryEntry> getEntries(String prefix);
+    public DictionaryEntry       getEntry(String key);
 }

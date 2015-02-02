@@ -24,15 +24,6 @@ public class Dictionary implements IDictionary {
         this.translations = target;
     }
 
-    @Override
-    public List<String> getTranslations(String key) {
-        return source.getValues(key);
-    }
-
-    @Override
-    public List<String> getKeys(String prefix) {
-        return source.getKeys(prefix);
-    }
     
     @Override
     public List<DictionaryEntry> getEntries(String prefix) {
@@ -43,12 +34,20 @@ public class Dictionary implements IDictionary {
             ret.add(
                 new DictionaryEntry(
                         key,
-                        this.getTranslations(key)
+                        source.getValues(key)
                 )
             );
         } 
         
         return ret;
+    }
+    
+    @Override
+    public DictionaryEntry getEntry(String key) {
+        return new DictionaryEntry(
+            key,
+            source.getValues(key)
+        );
     }
 
 }
