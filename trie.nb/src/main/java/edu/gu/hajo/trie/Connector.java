@@ -9,9 +9,9 @@ package edu.gu.hajo.trie;
  *
  * @author Mikael
  */
-public class Connector {
+public final class Connector {
     
-    TrieNode node;
+    private final TrieNode node;
     
     public Connector(TrieNode node){
         this.node = node;

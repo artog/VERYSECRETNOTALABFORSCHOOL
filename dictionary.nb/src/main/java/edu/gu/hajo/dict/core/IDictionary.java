@@ -11,5 +11,5 @@ import java.util.List;
 public interface IDictionary {
 
     public List<DictionaryEntry> getEntries(String prefix);
-    public DictionaryEntry       getEntry(String key);
+    
 }

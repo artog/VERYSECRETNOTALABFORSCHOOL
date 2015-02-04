@@ -42,12 +42,5 @@ public class Dictionary implements IDictionary {
         return ret;
     }
     
-    @Override
-    public DictionaryEntry getEntry(String key) {
-        return new DictionaryEntry(
-            key,
-            source.getValues(key)
-        );
-    }
 
 }

@@ -53,8 +53,8 @@ public class TestDictionary {
     public void testGetMatchesForEmpty() throws URISyntaxException,
             MalformedURLException, IOException {
         IDictionary d = DictionaryFactory.getDictionary(sv2en);
-        DictionaryEntry de = d.getEntry("");
-        assertTrue(de.getTranslations().isEmpty());
+        List<DictionaryEntry> de = d.getEntries("");
+        assertTrue(de.size() == 13);
     }
 
     @Test
@@ -63,8 +63,10 @@ public class TestDictionary {
     {
         IDictionary d = DictionaryFactory.getDictionary(sv2en);
 
-        DictionaryEntry de = d.getEntry("personbil");
-        List<String> matches = de.getTranslations();
+        List<DictionaryEntry> de = d.getEntries("personbil");
+        assertTrue(de.size() == 1);
+        
+        List<String> matches = de.get(0).getTranslations();
         assertTrue(matches.size() == 4);
         assertTrue(matches.get(1).equals("motorcar"));
     }
