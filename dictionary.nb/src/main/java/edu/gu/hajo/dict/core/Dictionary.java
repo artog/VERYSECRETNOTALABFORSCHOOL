@@ -1,5 +1,6 @@
 package edu.gu.hajo.dict.core;
 
+import edu.gu.hajo.trie.Connector;
 import edu.gu.hajo.trie.IConnectableTrie;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,14 @@ public class Dictionary implements IDictionary {
         } 
         
         return ret;
+    }
+    
+    public void add(DictionaryEntry entry) {
+        
+        Connector connector = source.insert(entry.getSource());
+        for (String translation : entry.getTranslations()) {
+            connector.connect(this.translations.insert(translation));
+        }
     }
     
 

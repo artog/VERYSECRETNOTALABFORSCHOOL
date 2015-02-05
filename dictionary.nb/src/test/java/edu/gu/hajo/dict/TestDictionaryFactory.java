@@ -15,8 +15,11 @@ public class TestDictionaryFactory {
     public void testGetLanguages() throws IOException, URISyntaxException {
         URI uri = DictionaryFactory.getDictionaryUri(DictionaryReader.DEFAULT_PATH,
                 Language.en_US, Language.sv_SV);
+        URI uri2 = DictionaryFactory.getDictionaryUri(Language.en_US, Language.sv_SV);
         IDictionary d = DictionaryFactory.getDictionary(uri);
+        IDictionary d2 = DictionaryFactory.getDictionary(uri2);
         assertTrue(d != null);
+        assertTrue(d2 != null);
     }
 
 }

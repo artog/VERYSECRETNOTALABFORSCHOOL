@@ -42,11 +42,17 @@ public class TestDictionary {
         vs.add("ccc");
 
         Dictionary d = new Dictionary(ConnectableTrieFactory.newInstance(), ConnectableTrieFactory.newInstance());
-//     
-//        for (String s : vs) {
-//            List<String> matches = d.getTranslations(s);
-//            
-//        }
+        DictionaryEntry de = new DictionaryEntry("ööö",vs);
+        d.add(de);
+        
+        List<DictionaryEntry> result = d.getEntries("");
+        assertTrue(result.size() == 1);
+        
+        DictionaryEntry e = result.get(0);
+        String source = e.getSource();
+        
+        assertTrue(source.equals("ööö"));
+        assertTrue(e.getTranslations().size() == 3);
     }
 
     @Test

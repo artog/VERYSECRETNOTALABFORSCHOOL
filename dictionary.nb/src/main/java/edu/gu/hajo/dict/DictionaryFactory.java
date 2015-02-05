@@ -27,16 +27,13 @@ public final class DictionaryFactory {
         IConnectableTrie source = ConnectableTrieFactory.newInstance();
         IConnectableTrie target = ConnectableTrieFactory.newInstance();
        
-        for(String i : words){
-            DictionaryEntry entry = DictionaryEntryConverter.toObject(i);
-           
-            Connector connector = source.insert(entry.getSource());
-            for(String translations : entry.getTranslations()){
-                connector.connect(target.insert(translations));
-            }   
+        Dictionary d = new Dictionary(source, target);
+        
+        for(String i : words) {
+            d.add(DictionaryEntryConverter.toObject(i));
         }
 
-       return new Dictionary(source, target);
+       return d;
     }
 
     public static URI getDictionaryUri(String dictionaryPath, Language from, Language to) {

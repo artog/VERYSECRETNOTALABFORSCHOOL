@@ -16,7 +16,7 @@ class DictionaryEntryConverter {
     public final static String wSepChar = "=";
     public final static String tSepChar = ",";
 
-    // No onstances
+    // No instances
     private DictionaryEntryConverter() {
     }
 
@@ -37,16 +37,10 @@ class DictionaryEntryConverter {
         
         StringBuilder sb = new StringBuilder(word);
         sb.append("=");
-        boolean first = true;
-        for (String translation : translations) {
-            if (!first) {
-                sb.append(",");
-            } else {
-                first = false;
-            }
-            sb.append(translation);
-            
-        }
+        
+        sb.append(
+            String.join(tSepChar, translations)
+        );
         return sb.toString();
     }
 
