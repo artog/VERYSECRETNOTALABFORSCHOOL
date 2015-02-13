@@ -10,8 +10,9 @@ public class Event {
 
     // All possible events listed
     public enum Tag {
-
-        TODO         // Add your own events here
+        PREFIX_CHANGED,
+        TRANSLATIONS_CHANGED,
+        LANG_CHANGED
     }
 
     private final Tag tag;
