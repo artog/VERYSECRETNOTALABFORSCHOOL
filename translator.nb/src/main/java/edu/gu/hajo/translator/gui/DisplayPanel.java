@@ -34,7 +34,17 @@ public class DisplayPanel extends JPanel implements IEventHandler {
 
     @Override
     public void onEvent(Event evt) {
-     
+        switch (evt.getTag()) {
+            case PREFIX_CHANGED:
+                Object o = evt.getValue();
+                if (o instanceof String) {
+                    String newValue = (String) o;
+                    inPut.setText(newValue);
+                }
+                break;
+            case TRANSLATIONS_CHANGED:
+                break;
+        }
     }
 
     private void clear() {
