@@ -14,4 +14,12 @@ public class Translator implements ITranslator {
   
     }
 
+    @Override
+    public void addToPrefix(char c) {
+    }
+
+    @Override
+    public void removeFromPrefix() {
+    }
+
 }
