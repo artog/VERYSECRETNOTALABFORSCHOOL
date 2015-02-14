@@ -8,6 +8,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import static java.lang.System.out;
+
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.ctrl.LanguageCtrl;
 import edu.gu.hajo.translator.event.Event;
@@ -35,7 +37,30 @@ public class LanguageSelectionPanel extends JPanel implements ActionListener, IE
 
     @Override
     public void actionPerformed(ActionEvent e) {
-     
+        try {
+            JComboBox cBox = (JComboBox)e.getSource();
+            JComboBox otherBox;
+            if (cBox == fromBox) {
+                otherBox = toBox;
+            } else {
+                otherBox = fromBox;
+            }
+            
+            if (cBox.getSelectedItem() instanceof SelectItem) {
+                SelectItem se = (SelectItem) cBox.getSelectedItem();
+                SelectItem other = ((SelectItem)otherBox.getSelectedItem());
+                if (other.getValue().equals(se.getValue())) {
+                    otherBox.setSelectedIndex(0);
+                } else {
+                    Language from = ((SelectItem)fromBox.getSelectedItem()).getValue();
+                    Language to   = ((SelectItem)toBox.getSelectedItem()).getValue();
+                    languageCtrl.setFrom(from);
+                    languageCtrl.setTo(to);
+                }
+            }
+        } catch (ClassCastException ex) {
+            // Do nothing ...
+        }
     }
 
     @Override
