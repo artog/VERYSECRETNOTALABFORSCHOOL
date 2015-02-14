@@ -40,17 +40,27 @@ public class KeyboardPanel extends JPanel implements ActionListener,
 
     public KeyboardPanel() {
         init();
-         initKeys(Language.sv_SV);
+        initKeys(Language.sv_SV);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      
+      String cmd = e.getActionCommand();
+      if (cmd.length() > 0) {
+          char c = cmd.charAt(0);
+          translator.addToPrefix(c);
+      }
     }
 
     @Override
     public void onEvent(Event evt) {
-      
+        switch (evt.getTag()) {
+            case LANG_CHANGED:
+                if (evt.getValue() instanceof ITranslator) {
+                    translator = (ITranslator) evt.getValue();
+                }
+                break;
+        }
     }
 
     public final void init() {

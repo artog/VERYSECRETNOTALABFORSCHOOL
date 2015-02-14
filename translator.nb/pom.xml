@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>edu.gu.hajo</groupId>
-  <artifactId>translator_skel.nb</artifactId>
+  <artifactId>translator.nb</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>translator_skel.nb</name>
+  <name>translator.nb</name>
   <url>http://maven.apache.org</url>
     <build>
         <plugins>

@@ -29,7 +29,13 @@ public class ButtonPanel extends JPanel implements ActionListener, IEventHandler
 
     @Override
     public void onEvent(Event evt) {
-      
+        switch (evt.getTag()) {
+            case LANG_CHANGED:
+                if (evt.getValue() instanceof ITranslator) {
+                    translator = (ITranslator) evt.getValue();
+                }
+                break;
+        }
     }
 
     @Override
