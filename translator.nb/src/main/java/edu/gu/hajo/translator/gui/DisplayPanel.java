@@ -11,7 +11,9 @@ import javax.swing.ListModel;
 
 import edu.gu.hajo.translator.core.Constants;
 import edu.gu.hajo.translator.event.Event;
+import edu.gu.hajo.translator.event.EventBus;
 import edu.gu.hajo.translator.event.IEventHandler;
+import java.util.List;
 
 /**
  * Panel for the input text field (word to translate) and the output (list of
@@ -34,15 +36,26 @@ public class DisplayPanel extends JPanel implements IEventHandler {
 
     @Override
     public void onEvent(Event evt) {
+        System.out.println(evt);
+        Object o = evt.getValue();
         switch (evt.getTag()) {
             case PREFIX_CHANGED:
-                Object o = evt.getValue();
                 if (o instanceof String) {
                     String newValue = (String) o;
                     inPut.setText(newValue);
                 }
                 break;
             case TRANSLATIONS_CHANGED:
+                if (o instanceof List) {
+                    List<Object> translations = (List)o;
+                    if (translations.get(0) instanceof String) {
+                        DefaultListModel<String> lm = new DefaultListModel<>();
+                        for (Object translation : translations) {
+                            lm.addElement(translation.toString());                            
+                        }
+                        outPut.setModel(lm);
+                    }
+                }
                 break;
         }
     }
@@ -59,6 +72,8 @@ public class DisplayPanel extends JPanel implements IEventHandler {
         inPut.setEditable(false);
         this.add(inPut, BorderLayout.NORTH);
         this.add(outPut, BorderLayout.CENTER);
+        
+        EventBus.INSTANCE.register(this);
 
     }
 }
