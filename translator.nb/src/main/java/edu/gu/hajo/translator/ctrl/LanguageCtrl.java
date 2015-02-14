@@ -17,16 +17,20 @@ public class LanguageCtrl {
     private Language to;
 
     public void setFrom(Language from) {
-        this.from = from;
-        load();
+        if (this.from == null || !this.from.equals(from)) {   
+            this.from = from;
+            load();
+        }
     }
 
     public void setTo(Language to) {
-        this.to = to;
-        load();
+        if (this.to == null || !this.to.equals(to)) {   
+            this.to = to;
+            load();
+        }
     }
 
     private void load() {
-       
+       System.out.println("Load "+from+"->"+to);
     }
 }
