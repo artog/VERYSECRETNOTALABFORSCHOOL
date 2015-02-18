@@ -9,4 +9,6 @@ package edu.gu.hajo.translator.core;
 public interface ITranslator {
    public void addToPrefix(char c);
    public void removeFromPrefix();
+   public void clearPrefix();
+   public String[] getTranslations();
 }
