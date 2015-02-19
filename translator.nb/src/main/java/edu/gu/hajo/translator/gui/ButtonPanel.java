@@ -2,6 +2,7 @@ package edu.gu.hajo.translator.gui;
 
 import edu.gu.hajo.translator.core.ITranslator;
 import edu.gu.hajo.translator.event.Event;
+import edu.gu.hajo.translator.event.EventBus;
 import edu.gu.hajo.translator.event.IEventHandler;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -40,10 +41,21 @@ public class ButtonPanel extends JPanel implements ActionListener, IEventHandler
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      
+        String cmd = e.getActionCommand();
+        switch(cmd.toUpperCase()){
+            case "BACKSP":
+                translator.removeFromPrefix();
+                break;
+            case "CLEAR":
+                translator.clearPrefix();
+                break;
+            default:
+                System.out.println("Error: Invalid ButtonPanel command!");
+        }
     }
 
     private void init() {
+        EventBus.INSTANCE.register(this);
         backspace.addActionListener(this);
         clear.addActionListener(this);
         this.setLayout(new GridLayout(3, 1));

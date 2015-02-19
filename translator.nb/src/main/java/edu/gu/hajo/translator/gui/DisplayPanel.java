@@ -36,7 +36,6 @@ public class DisplayPanel extends JPanel implements IEventHandler {
 
     @Override
     public void onEvent(Event evt) {
-        System.out.println(evt);
         Object o = evt.getValue();
         switch (evt.getTag()) {
             case PREFIX_CHANGED:

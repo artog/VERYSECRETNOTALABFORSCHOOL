@@ -1,6 +1,7 @@
 package edu.gu.hajo.translator.ctrl;
 
 
+import edu.gu.hajo.dict.DictionaryFactory;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.core.EventTranslator;
 import edu.gu.hajo.translator.core.ITranslator;
@@ -19,23 +20,24 @@ public class LanguageCtrl {
     private Language to;
     private ITranslator translator;
 
-    public void LanguageCtrl(){
+    public LanguageCtrl(){
         this.from = Language.xx_XX;
         this.to = Language.xx_XX;
+        translator = new EventTranslator(from, to);
     }
     
     public void setFrom(Language from) {
-        //if (from != null && !this.from.equals(from)) {   // Mysterious NullPointerException!
+        if (from != null && !this.from.equals(from)) {   // Mysterious NullPointerException!
             this.from = from;
             load();
-        //}
+        }
     }
 
     public void setTo(Language to) {
-        //if (to != null && !this.to.equals(to)) {      // Mysterious NullPointerException!
+        if (to != null && !this.to.equals(to)) {      // Mysterious NullPointerException!
             this.to = to;
             load();
-        //}
+        }
     }
 
     private void load() {

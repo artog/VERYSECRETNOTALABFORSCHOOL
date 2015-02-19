@@ -13,6 +13,7 @@ import javax.swing.border.LineBorder;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.core.ITranslator;
 import edu.gu.hajo.translator.event.Event;
+import edu.gu.hajo.translator.event.EventBus;
 import edu.gu.hajo.translator.event.IEventHandler;
 import java.awt.Font;
 import java.awt.Insets;
@@ -65,6 +66,7 @@ public class KeyboardPanel extends JPanel implements ActionListener,
     }
 
     public final void init() {
+        EventBus.INSTANCE.register(this);
         GridLayout gridLayout = new GridLayout(ROWS, COLS);
         gridLayout.setHgap(2);
         gridLayout.setVgap(2);
