@@ -24,7 +24,6 @@ public class Translator implements ITranslator {
         try {
             URI dictionaryUri = DictionaryFactory.getDictionaryUri(from, to);
             dictionary = DictionaryFactory.getDictionary(dictionaryUri);
-            if (from == Language.de_DE) throw new IOException();
         } catch (IOException ex) {
             throw new TranslatorException("Kunde inte läsa språkfilen");
         } catch (Exception ex) {

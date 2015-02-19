@@ -2,6 +2,7 @@ package edu.gu.hajo.translator.gui;
 
 import edu.gu.hajo.translator.core.ITranslator;
 import edu.gu.hajo.translator.event.Event;
+import edu.gu.hajo.translator.event.EventBus;
 import edu.gu.hajo.translator.event.IEventHandler;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -32,6 +33,8 @@ public class MainFrame extends JFrame implements IEventHandler {
 
     public MainFrame(JPanel controlPanel, JPanel ioPanel,
             JPanel languageSelectionPanel) {
+        
+        EventBus.INSTANCE.register(this);
         this.setLayout(new BorderLayout());
         this.addWindowListener(listener);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -44,7 +47,9 @@ public class MainFrame extends JFrame implements IEventHandler {
 
     @Override
     public void onEvent(Event evt) {
-     
+        if (evt.getTag() == Event.Tag.ERROR) {
+            JOptionPane.showMessageDialog(this, evt.getValue(), "Fel", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // Handling shutdown -----------------
