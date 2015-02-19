@@ -13,6 +13,7 @@ public class EventTranslator extends Translator {
 
     public EventTranslator(Language from, Language to) {
         super(from, to);
+        EventBus.INSTANCE.publish(new Event(Event.Tag.LANG_CHANGED, this));
     }
     
     @Override

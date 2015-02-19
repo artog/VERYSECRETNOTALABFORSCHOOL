@@ -34,7 +34,7 @@ public class KeyboardPanel extends JPanel implements ActionListener,
     private final static int ROWS = 3;
     private final static int COLS = 14;
     public static final Font font = new Font("Serif", Font.BOLD, 12);
-     public static final Insets insets =  new Insets(2,2,2,2);
+    public static final Insets insets =  new Insets(2,2,2,2);
     private ITranslator translator;
     private JButton[] buttons;
 
@@ -48,6 +48,7 @@ public class KeyboardPanel extends JPanel implements ActionListener,
       String cmd = e.getActionCommand();
       if (cmd.length() > 0) {
           char c = cmd.charAt(0);
+
           translator.addToPrefix(c);
       }
     }

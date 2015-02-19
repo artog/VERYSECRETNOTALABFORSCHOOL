@@ -20,7 +20,7 @@ import java.util.List;
  *
  */
 public final class DictionaryFactory {
-
+    
     public static IDictionary getDictionary(URI uri) throws IOException {
         List<String> words = DictionaryReader.INSTANCE.open(uri);
        
@@ -34,6 +34,14 @@ public final class DictionaryFactory {
         }
 
        return d;
+    }
+    
+    public static IDictionary getDummyDictionary(){
+        IConnectableTrie source = ConnectableTrieFactory.newInstance();
+        IConnectableTrie target = ConnectableTrieFactory.newInstance();
+        
+        Dictionary d = new Dictionary(source, target);
+        return d;
     }
 
     public static URI getDictionaryUri(String dictionaryPath, Language from, Language to) {

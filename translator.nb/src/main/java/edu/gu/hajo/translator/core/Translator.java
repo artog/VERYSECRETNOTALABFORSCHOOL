@@ -4,11 +4,8 @@ import edu.gu.hajo.dict.DictionaryFactory;
 import edu.gu.hajo.dict.core.DictionaryEntry;
 import edu.gu.hajo.dict.core.IDictionary;
 import edu.gu.hajo.dict.core.Language;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The main model class.
@@ -23,11 +20,10 @@ public class Translator implements ITranslator {
     
     public Translator(Language from, Language to) {
         try {
-            dictionary = DictionaryFactory.getDictionary(
-                DictionaryFactory.getDictionaryUri(from, to)
-            );
-        } catch (IOException ex) {
-            System.out.println("IOException: Error reading dictionary.");
+            URI dictionaryUri = DictionaryFactory.getDictionaryUri(from, to);
+            dictionary = DictionaryFactory.getDictionary(dictionaryUri);
+        } catch (Exception ex) {
+            dictionary = DictionaryFactory.getDummyDictionary();
         }
         prefix = Constants.EMPTY_STR;
     }
@@ -55,6 +51,7 @@ public class Translator implements ITranslator {
         String[] translations = new String[entries.size()];
         
         for(int i = 0; i < entries.size(); i++){
+            // TODO: Change this to a better format!!
             translations[i] = entries.get(i).getSource() + "\t" + entries.get(i).getTranslations().toString();
         }
         

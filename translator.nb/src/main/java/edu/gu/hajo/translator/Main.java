@@ -36,11 +36,6 @@ public class Main {
             JOptionPane.showMessageDialog(null, "Application couldn't start. Sorry!");
             System.exit(1);
         }
-        Language from = Language.sv_SV;
-        Language to = Language.en_US;
-
-        // Build model
-        ITranslator translator = new EventTranslator(from, to);
 
         // Notify GUI 
         /*
