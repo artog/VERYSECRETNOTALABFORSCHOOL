@@ -55,8 +55,7 @@ public class Translator implements ITranslator {
         String[] translations = new String[entries.size()];
         
         for(int i = 0; i < entries.size(); i++){
-            // TODO: Change this to a better format!!
-            translations[i] = entries.get(i).getSource() + "\t" + entries.get(i).getTranslations().toString();
+            translations[i] = entries.get(i).toString();
         }
         
         return translations;

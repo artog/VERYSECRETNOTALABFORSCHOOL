@@ -62,6 +62,11 @@ public class KeyboardPanel extends JPanel implements ActionListener,
                     translator = (ITranslator) evt.getValue();
                 }
                 break;
+            case KEYBOARD_CHANGE:
+                if(evt.getValue() instanceof Language){
+                    initKeys((Language) evt.getValue());
+                }
+                break;
         }
     }
 

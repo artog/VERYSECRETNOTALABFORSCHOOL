@@ -13,6 +13,7 @@ public class Event {
         PREFIX_CHANGED,
         TRANSLATIONS_CHANGED,
         LANG_CHANGED,
+        KEYBOARD_CHANGE,
         ERROR
     }
 
