@@ -12,7 +12,8 @@ public class Event {
     public enum Tag {
         PREFIX_CHANGED,
         TRANSLATIONS_CHANGED,
-        LANG_CHANGED
+        LANG_CHANGED,
+        KEYBOARD_CHANGE
     }
 
     private final Tag tag;

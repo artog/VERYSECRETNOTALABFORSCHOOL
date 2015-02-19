@@ -5,6 +5,8 @@ import edu.gu.hajo.dict.DictionaryFactory;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.core.EventTranslator;
 import edu.gu.hajo.translator.core.ITranslator;
+import edu.gu.hajo.translator.event.EventBus;
+import edu.gu.hajo.translator.event.Event;
 
 /**
  * Handles interaction between GUI and Translator
@@ -29,6 +31,7 @@ public class LanguageCtrl {
     public void setFrom(Language from) {
         if (from != null && !this.from.equals(from)) {   // Mysterious NullPointerException!
             this.from = from;
+            EventBus.INSTANCE.publish(new Event(Event.Tag.KEYBOARD_CHANGE, from));
             load();
         }
     }
