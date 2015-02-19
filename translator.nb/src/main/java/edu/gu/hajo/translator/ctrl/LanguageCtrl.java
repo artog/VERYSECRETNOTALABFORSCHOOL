@@ -5,6 +5,9 @@ import edu.gu.hajo.dict.DictionaryFactory;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.core.EventTranslator;
 import edu.gu.hajo.translator.core.ITranslator;
+import edu.gu.hajo.translator.event.Event;
+import edu.gu.hajo.translator.event.EventBus;
+import edu.gu.hajo.translator.exception.TranslatorException;
 
 /**
  * Handles interaction between GUI and Translator
@@ -42,6 +45,12 @@ public class LanguageCtrl {
 
     private void load() {
        System.out.println("Load "+from+"->"+to);
-       translator = new EventTranslator(from, to);
+       try {
+           translator = new EventTranslator(from, to);
+       } catch (TranslatorException e) {
+           EventBus.INSTANCE.publish(
+               new Event(Event.Tag.ERROR,e.getMessage())
+           );
+       }
     }
 }
