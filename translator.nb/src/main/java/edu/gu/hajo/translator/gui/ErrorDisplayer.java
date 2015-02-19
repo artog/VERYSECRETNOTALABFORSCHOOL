@@ -17,10 +17,10 @@ import javax.swing.JOptionPane;
 public class ErrorDisplayer implements IEventHandler {
 
     
-    private static ErrorDisplayer instance = new ErrorDisplayer();
+    public static final ErrorDisplayer instance = new ErrorDisplayer();
     
     
-    private ErrorDisplayer() {
+    public ErrorDisplayer() {
         EventBus.INSTANCE.register(this);
     }
     
