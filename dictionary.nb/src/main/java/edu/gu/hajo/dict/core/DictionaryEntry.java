@@ -32,7 +32,6 @@ public final class DictionaryEntry  {
 	// This is good for debug
 	@Override
 	public String toString() {
-		return "[source=" + source + ", translations="
-				+ translations + "]";
+            return source + "    " + translations;
 	}
 }

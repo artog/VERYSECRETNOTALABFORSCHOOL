@@ -20,17 +20,20 @@ public class EventTranslator extends Translator {
     public void addToPrefix(char c) {
         super.addToPrefix(c);
         EventBus.INSTANCE.publish(new Event(Event.Tag.PREFIX_CHANGED, prefix));
+        EventBus.INSTANCE.publish(new Event(Event.Tag.TRANSLATIONS_CHANGED, getTranslations()));
     }
 
     @Override
     public void removeFromPrefix() {
         super.removeFromPrefix();
         EventBus.INSTANCE.publish(new Event(Event.Tag.PREFIX_CHANGED, prefix));
+        EventBus.INSTANCE.publish(new Event(Event.Tag.TRANSLATIONS_CHANGED, getTranslations()));
     }
     
     @Override
     public void clearPrefix(){
         super.clearPrefix();
         EventBus.INSTANCE.publish(new Event(Event.Tag.PREFIX_CHANGED, prefix));
+        EventBus.INSTANCE.publish(new Event(Event.Tag.TRANSLATIONS_CHANGED, getTranslations()));
     }
 }

@@ -45,15 +45,13 @@ public class DisplayPanel extends JPanel implements IEventHandler {
                 }
                 break;
             case TRANSLATIONS_CHANGED:
-                if (o instanceof List) {
-                    List<Object> translations = (List)o;
-                    if (translations.get(0) instanceof String) {
+                if (o instanceof String[]) {
+                    String[] translations = (String[])o;
                         DefaultListModel<String> lm = new DefaultListModel<>();
-                        for (Object translation : translations) {
+                        for (String translation : translations) {
                             lm.addElement(translation.toString());                            
                         }
                         outPut.setModel(lm);
-                    }
                 }
                 break;
         }
