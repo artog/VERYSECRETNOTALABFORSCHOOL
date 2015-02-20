@@ -10,8 +10,6 @@ import edu.gu.hajo.translator.event.EventBus;
 import java.awt.Component;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
-import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JTextField;
 import javax.swing.ListModel;

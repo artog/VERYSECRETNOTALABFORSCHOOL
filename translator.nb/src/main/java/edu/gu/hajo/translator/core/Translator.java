@@ -4,8 +4,8 @@ import edu.gu.hajo.dict.DictionaryFactory;
 import edu.gu.hajo.dict.core.DictionaryEntry;
 import edu.gu.hajo.dict.core.IDictionary;
 import edu.gu.hajo.dict.core.Language;
-import edu.gu.hajo.translator.exception.TranslatorException;
-import java.io.IOException;
+//import edu.gu.hajo.translator.exception.TranslatorException;
+//import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -24,8 +24,8 @@ public class Translator implements ITranslator {
         try {
             URI dictionaryUri = DictionaryFactory.getDictionaryUri(from, to);
             dictionary = DictionaryFactory.getDictionary(dictionaryUri);
-        } catch (IOException ex) {
-            throw new TranslatorException("Kunde inte läsa språkfilen");
+//        } catch (IOException ex) {
+//            throw new TranslatorException("Kunde inte läsa språkfilen");
         } catch (Exception ex) {
             dictionary = DictionaryFactory.getDummyDictionary();
         }

@@ -3,7 +3,7 @@ package edu.gu.hajo.translator.core;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.event.EventBus;
 import edu.gu.hajo.translator.event.Event;
-import edu.gu.hajo.translator.exception.TranslatorException;
+//import edu.gu.hajo.translator.exception.TranslatorException;
 
 /**
  * Extend model class Translator with events (messaging)

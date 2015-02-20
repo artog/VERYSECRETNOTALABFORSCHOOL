@@ -13,7 +13,6 @@ import edu.gu.hajo.translator.core.Constants;
 import edu.gu.hajo.translator.event.Event;
 import edu.gu.hajo.translator.event.EventBus;
 import edu.gu.hajo.translator.event.IEventHandler;
-import java.util.List;
 
 /**
  * Panel for the input text field (word to translate) and the output (list of
@@ -49,7 +48,7 @@ public class DisplayPanel extends JPanel implements IEventHandler {
                     String[] translations = (String[])o;
                         DefaultListModel<String> lm = new DefaultListModel<>();
                         for (String translation : translations) {
-                            lm.addElement(translation.toString());                            
+                            lm.addElement(translation);                            
                         }
                         outPut.setModel(lm);
                 }

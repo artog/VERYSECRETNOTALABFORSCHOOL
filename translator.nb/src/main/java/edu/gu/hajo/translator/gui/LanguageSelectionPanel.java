@@ -8,8 +8,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import static java.lang.System.out;
-
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.ctrl.LanguageCtrl;
 import edu.gu.hajo.translator.event.Event;

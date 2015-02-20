@@ -111,4 +111,5 @@ public class KeyboardPanel extends JPanel implements ActionListener,
                 return KEYS_ENGLISH;
         }
     }
+
 }

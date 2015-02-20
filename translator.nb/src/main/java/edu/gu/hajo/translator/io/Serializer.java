@@ -21,7 +21,7 @@ public class Serializer {
             ClassNotFoundException {
 
         File file = new File(fileName);
-        FileInputStream fileStream = null;
+        FileInputStream fileStream;
         fileStream = new FileInputStream(file);
         ObjectInputStream in = new ObjectInputStream(fileStream);
         @SuppressWarnings("unchecked")

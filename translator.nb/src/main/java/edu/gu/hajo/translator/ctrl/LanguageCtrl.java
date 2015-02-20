@@ -1,7 +1,6 @@
 package edu.gu.hajo.translator.ctrl;
 
 
-import edu.gu.hajo.dict.DictionaryFactory;
 import edu.gu.hajo.dict.core.Language;
 import edu.gu.hajo.translator.core.EventTranslator;
 import edu.gu.hajo.translator.core.ITranslator;

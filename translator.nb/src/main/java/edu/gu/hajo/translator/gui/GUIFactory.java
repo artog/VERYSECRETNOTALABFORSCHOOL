@@ -31,7 +31,7 @@ public final class GUIFactory {
                 = new LanguageSelectionPanel(new LanguageCtrl());
 
         MainFrame mf = new MainFrame(container, display, languageSelection);
-
+        EventBus.INSTANCE.register(mf);
         // Set as event listeners
 
         return mf;

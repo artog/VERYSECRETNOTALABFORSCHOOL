@@ -1,8 +1,5 @@
 package edu.gu.hajo.translator;
 
-import edu.gu.hajo.dict.core.Language;
-import edu.gu.hajo.translator.core.EventTranslator;
-import edu.gu.hajo.translator.core.ITranslator;
 import javax.swing.SwingUtilities;
 
 import edu.gu.hajo.translator.gui.GUIFactory;

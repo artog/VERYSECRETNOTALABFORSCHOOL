@@ -15,7 +15,7 @@ public enum EventBus {
     INSTANCE;
 
     private final List<IEventHandler> handlers = new ArrayList<>();
-    private boolean trace = true;
+    private final boolean trace = true;
 
     public void register(IEventHandler handler) {
         handlers.add(handler);
