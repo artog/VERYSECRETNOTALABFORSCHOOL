@@ -1,0 +1,11 @@
+#/bin/bash
+
+# Run in project directory
+
+# Possible need to change here
+main_class=edu.gu.hajo.chat.client.Main
+
+java -Djava.security.policy=security.policy -cp target/classes:../server.nb/target/classes ${main_class} fia 222 127.0.0.1 6666 7891
+
+exit 0
+

@@ -1,0 +1,10 @@
+*** Readme for RMI Chat Server ***
+
+Application need a policy file, there is an existing one,
+security.policy, see project directory (Files tab)
+
+To run server use script runserver.sh in project directory
+(else you must supply arguments to the
+JVM and to the application, like 
+... -Djava.security.policy=security.policy -Djava.rmi.server. ...
+

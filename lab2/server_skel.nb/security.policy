@@ -1,0 +1,14 @@
+/*
+* This file must be in the project directory
+*/
+
+/* Not to be used in real life */
+grant {
+permission java.security.AllPermission;
+};
+
+/*  TODO
+grant codeBase "file:." {
+    permission java.net.SocketPermission "*:1024-", "connect,accept";
+};
+*/

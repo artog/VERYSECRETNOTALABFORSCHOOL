@@ -10,6 +10,8 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/dictionary.nb/target/
-/trie.nb/target/
-/translator.nb/target/
+/lab1/dictionary.nb/target/
+/lab1/trie.nb/target/
+/lab1/translator.nb/target/
+/lab2/client_skel.nb/target/
+/lab2/server_skel.nb/target/
