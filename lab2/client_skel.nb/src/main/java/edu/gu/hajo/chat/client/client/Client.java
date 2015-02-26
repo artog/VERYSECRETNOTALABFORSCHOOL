@@ -33,7 +33,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     // -------------------------------------------------------------------
     // Handle over to Swing thread (from RMI thread)
     private void publishSwing(final IObserver.Event event, final Object data) {
-       
+        observer.onEvent(event, data);
     }
 
 }

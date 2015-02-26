@@ -8,6 +8,6 @@ package edu.gu.hajo.chat.client.client;
  */
 final class StateContext {
 
-  
+    
  
 }

@@ -9,6 +9,11 @@ import java.rmi.Remote;
  *
  */
 public interface IChatClient extends Remote {
+    
+    public void ping();
+    
+    public void userLeft(String user);
+    public void userJoined(String user);
 
-
+    public void message();
 }
