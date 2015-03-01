@@ -1,0 +1,1 @@
+java -Djava.security.policy=security.policy -cp target\classes:..\server_skel.nb\target\classes edu.gu.hajo.chat.client.Main pelle 111 127.0.0.1 6666 7890

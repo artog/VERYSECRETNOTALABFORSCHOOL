@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+dictionary.nb,edu.gu.hajo.dict.core,Dictionary,0,67,0,4,0,16,0,5,0,3
+dictionary.nb,edu.gu.hajo.dict.core,DictionaryEntry,0,48,0,0,0,11,0,4,0,4
+dictionary.nb,edu.gu.hajo.dict.core,Language,23,59,0,0,2,9,4,3,4,3
+dictionary.nb,edu.gu.hajo.dict.io,DictionaryReader,19,90,6,10,1,16,8,6,2,3
+dictionary.nb,edu.gu.hajo.dict,DictionaryEntryConverter,3,51,0,0,2,12,1,2,1,2
+dictionary.nb,edu.gu.hajo.dict,DictionaryFactory,3,73,0,2,1,13,1,4,1,3

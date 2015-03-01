@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>DictionaryEntryConverter.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dictionary.nb</a> &gt; <a href="index.source.html" class="el_package">edu.gu.hajo.dict</a> &gt; <span class="el_source">DictionaryEntryConverter.java</span></div><h1>DictionaryEntryConverter.java</h1><pre class="source lang-java linenums">package edu.gu.hajo.dict;
+
+import java.util.Arrays;
+
+import edu.gu.hajo.dict.core.DictionaryEntry;
+import java.util.List;
+
+/**
+ * Utility to convert from/to strings 
+ *
+ * @author hajo
+ *
+ */
+class DictionaryEntryConverter {
+
+    public final static String wSepChar = &quot;=&quot;;
+    public final static String tSepChar = &quot;,&quot;;
+
+    // No instances
+<span class="nc" id="L20">    private DictionaryEntryConverter() {</span>
+<span class="nc" id="L21">    }</span>
+
+    public static DictionaryEntry toObject(String s) {
+        // To problematic wich  swedish chars
+<span class="fc" id="L25">        String[] splitLine = s.split(wSepChar);</span>
+<span class="fc" id="L26">        String word = splitLine[0].trim();</span>
+<span class="fc" id="L27">        String trimmed = splitLine[1].replaceAll(&quot;\\s&quot;,&quot;&quot;);</span>
+<span class="fc" id="L28">        String[] trans = trimmed.split(tSepChar);</span>
+        
+<span class="fc" id="L30">        return new DictionaryEntry(word, Arrays.asList(trans));</span>
+    }
+
+    // The inverse, not implemented, not needed.
+    public static String toString(DictionaryEntry e) {
+<span class="fc" id="L35">        List&lt;String&gt; translations = e.getTranslations();</span>
+<span class="fc" id="L36">        String word = e.getSource();</span>
+        
+<span class="fc" id="L38">        StringBuilder sb = new StringBuilder(word);</span>
+<span class="fc" id="L39">        sb.append(&quot;=&quot;);</span>
+        
+<span class="fc" id="L41">        sb.append(</span>
+<span class="fc" id="L42">            String.join(tSepChar, translations)</span>
+        );
+<span class="fc" id="L44">        return sb.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span></div></body></html>

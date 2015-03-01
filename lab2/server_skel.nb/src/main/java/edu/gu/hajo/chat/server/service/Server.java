@@ -46,4 +46,9 @@ public class Server implements IChatServer {
     // --------- Privates -----------
     // Clients alive?
     private final TimerTask pinger = null;
+
+    @Override
+    public void sendMessage(String msg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

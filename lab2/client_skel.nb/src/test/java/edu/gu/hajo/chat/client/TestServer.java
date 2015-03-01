@@ -41,7 +41,7 @@ public class TestServer {
                 ChatClientOptions.getConnection().getMyPort());
     }
 
-    @Test
+    //@Test
     public void testPing() throws RemoteException, NotBoundException {
         System.out.println("***" + server.ping() + "***");
     }
