@@ -32,6 +32,8 @@ public class Server implements IChatServer {
 
     private final Chat chat;
 
+    private final List<IChatClient> clients = new ArrayList();
+    
     public Server(Chat chat) {
         this.chat = chat;
     }
