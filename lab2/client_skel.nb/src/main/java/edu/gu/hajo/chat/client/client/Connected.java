@@ -27,7 +27,7 @@ public class Connected implements IState{
     private IChatServer server;
     private Client client;
     
-    public Connected(StateContext context, Client client, Server server){
+    public Connected(StateContext context, Client client, IChatServer server){
         this.context = context;
 
         System.out.println("New Connected was born!"); //TODO: remove this

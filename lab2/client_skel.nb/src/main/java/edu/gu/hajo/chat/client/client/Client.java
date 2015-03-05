@@ -61,7 +61,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void connect() {
-        context.connect();
+        context.connect(this);
         publishSwing(Event.CONNECTED, me);
     }
 
