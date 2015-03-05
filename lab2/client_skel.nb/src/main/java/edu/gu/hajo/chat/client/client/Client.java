@@ -7,6 +7,8 @@ import edu.gu.hajo.chat.server.spec.IPeer;
 import edu.gu.hajo.chat.server.core.User;
 import java.io.Serializable;
 
+import static edu.gu.hajo.chat.client.client.IObserver.Event;
+
 /**
  * Implementation of many interfaces. Serializable important!
  *
@@ -32,7 +34,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     // IClient -----------------------------------------------
     // -------------------------------------------------------------------
     // Handle over to Swing thread (from RMI thread)
-    private void publishSwing(final IObserver.Event event, final Object data) {
+    private void publishSwing(final Event event, final Object data) {
         observer.onEvent(event, data);
     }
 
@@ -58,7 +60,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void connect() {
-        context.set(new Connected());
+        context.set(new Connected(this));
     }
 
     @Override

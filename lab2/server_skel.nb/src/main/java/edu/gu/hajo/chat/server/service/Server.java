@@ -42,7 +42,7 @@ public class Server implements IChatServer {
 
     // ------- IServer ---------------------------------------------
     @Override
-    public synchronized String ping() throws RemoteException {
+    public synchronized String ping(){
         LOG.log(Level.INFO, "Pinged!");
         return Constants.SERVER_PING_MESSAGE;
     }
@@ -52,7 +52,7 @@ public class Server implements IChatServer {
     private final TimerTask pinger = null;
 
     @Override
-    public void sendMessage(String msg) {
+    public void sendMessage(String msg){
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

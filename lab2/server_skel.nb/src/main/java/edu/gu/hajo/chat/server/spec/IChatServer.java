@@ -14,5 +14,5 @@ public interface IChatServer extends Remote {
     // Utility
     public String ping() throws RemoteException;
     
-    public void sendMessage(String msg);
+    public void sendMessage(String msg) throws RemoteException;
 }
