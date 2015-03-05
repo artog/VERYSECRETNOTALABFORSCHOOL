@@ -46,12 +46,12 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void userLeft(String user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        publishSwing(Event.USER_LEFT, user);
     }
 
     @Override
     public void userJoined(String user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        publishSwing(Event.USER_JOINED, user);
     }
 
     @Override

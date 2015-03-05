@@ -7,8 +7,11 @@ import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,17 +54,19 @@ public class Server implements IChatServer {
 
         @Override
         public void run() {
-            synchronized (clients) {
-                Set<String> keys = clients.keySet();
-                
-                for (String key : keys) {
-                    try {
-                        clients.get(key).ping();
-                    } catch (Exception ex) {
-                        disconnectUser(key);
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            Set<String> keys = clients.keySet();
+            List<String> deadClients = new ArrayList();
+            
+            for (String key : keys) {
+                try {
+                    clients.get(key).ping();
+                } catch (Exception ex) {
+                    deadClients.add(key);
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+            for (String key : deadClients) {
+                disconnectUser(key);
             }
         }
         
@@ -76,12 +81,18 @@ public class Server implements IChatServer {
     public User connect(IChatClient client) throws RemoteException {
         User user = chat.login(client.getLogin(), client.getPassword());
         if(user != null){
+            for (IChatClient c : clients.values()) {
+                c.userJoined(client.getLogin());
+            }
             
             clients.put(
                 client.getLogin(),
                 client
             );
             
+            for (Entry<String,IChatClient> e : clients.entrySet()) {
+                client.userJoined(e.getKey());
+            }
             LOG.log(Level.INFO, "{0} has connected.", client.getLogin());
         }
         else{
@@ -103,6 +114,15 @@ public class Server implements IChatServer {
     private void disconnectUser(String key) {
         chat.logout(chat.getUser(key));
         clients.remove(key);
+        synchronized (clients) {
+            for (IChatClient c : clients.values()) {
+                try {
+                    c.userLeft(key);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
         LOG.log(Level.INFO, "{0} has disconnected.", key);
     }
 }
