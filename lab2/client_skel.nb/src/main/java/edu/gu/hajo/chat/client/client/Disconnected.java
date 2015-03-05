@@ -30,6 +30,7 @@ public class Disconnected implements IState{
 
     @Override
     public User connect(Client client) {
+        User user = null;
         try {
             Registry registry = LocateRegistry.getRegistry(
                 ChatClientOptions.getConnection().getRegistryIp(),
@@ -41,16 +42,16 @@ public class Disconnected implements IState{
             UnicastRemoteObject.exportObject(client,
                     ChatClientOptions.getConnection().getMyPort());
             
-            User user = server.connect(client);
+            user = server.connect(client);
             
             if(user != null){
-                client.setUser(user);
                 context.set(new Connected(context, client, server));
             }
             
         } catch (RemoteException | NotBoundException ex) {
             ex.printStackTrace();
         }
+        return user;
     }
 
     @Override
