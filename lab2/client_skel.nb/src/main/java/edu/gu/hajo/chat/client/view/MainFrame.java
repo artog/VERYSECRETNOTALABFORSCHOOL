@@ -66,7 +66,7 @@ public class MainFrame extends JFrame implements ActionListener, IObserver {
                 
                 break;
             case DISCONNECT_CMD:
-                
+                client.disconnect();
                 break;
             default:
         }

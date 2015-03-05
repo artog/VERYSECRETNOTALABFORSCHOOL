@@ -5,6 +5,7 @@ import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
+import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class Server implements IChatServer {
                 for (String key : keys) {
                     try {
                         clients.get(key).ping();
-                    } catch (RemoteException ex) {
+                    } catch (Exception ex) {
                         disconnectUser(key);
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -81,10 +82,10 @@ public class Server implements IChatServer {
                 client
             );
             
-            System.out.println(client.getLogin() + " has connected.");
+            LOG.log(Level.INFO, "{0} has connected.", client.getLogin());
         }
         else{
-            System.out.println("Failed attempt to login."); 
+            LOG.log(Level.INFO, "Failed to login.");
         }
         
         return user;
@@ -102,6 +103,7 @@ public class Server implements IChatServer {
     private void disconnectUser(String key) {
         chat.logout(chat.getUser(key));
         clients.remove(key);
+        LOG.log(Level.INFO, "{0} has disconnected.", key);
     }
 }
 

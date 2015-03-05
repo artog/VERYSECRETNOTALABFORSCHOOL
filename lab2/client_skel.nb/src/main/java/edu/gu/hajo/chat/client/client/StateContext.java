@@ -19,5 +19,7 @@ final class StateContext {
         return state.connect(client);
     }
     
-    public void disconnect(){}
+    public void disconnect(){
+        state.disconnect();
+    }
 }

@@ -25,7 +25,7 @@ public class Disconnected implements IState{
     
     public Disconnected(StateContext context){
         this.context = context;
-        System.out.println("New Disonnected was born!"); //TODO: remove this
+        System.out.println("New Disconnected was born!"); //TODO: remove this
     }
 
     @Override

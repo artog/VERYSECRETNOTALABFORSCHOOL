@@ -71,6 +71,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     @Override
     public void disconnect() {
         context.disconnect();
+        publishSwing(Event.DISCONNECTED, "");
     }
 
     @Override

@@ -31,6 +31,8 @@ public class Connected implements IState{
     
     public Connected(StateContext context, Client client, IChatServer server){
         this.context = context;
+        this.server = server;
+        this.client = client;
 
         System.out.println("New Connected was born!"); //TODO: remove this
     }
@@ -44,6 +46,7 @@ public class Connected implements IState{
     public void disconnect() {
         try {
             server.disconnect(client);
+            UnicastRemoteObject.unexportObject(client, true);
         } catch (RemoteException ex) {
             Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, null, ex);
             // Wat?
