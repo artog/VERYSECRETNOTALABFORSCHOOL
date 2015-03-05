@@ -15,3 +15,5 @@ hs_err_pid*
 /lab1/translator.nb/target/
 /lab2/client_skel.nb/target/
 /lab2/server_skel.nb/target/
+lab2/client_skel.nb/nbactions.xml
+lab2/server_skel.nb/nbactions.xml
