@@ -7,5 +7,6 @@ package edu.gu.hajo.chat.client.client;
  * @author hajo
  */
 public interface ILocalClient {
- 
+    public void connect();
+    public void disconnect();
 }

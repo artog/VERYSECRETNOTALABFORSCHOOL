@@ -1,5 +1,6 @@
 package edu.gu.hajo.chat.server.spec;
 
+import edu.gu.hajo.chat.server.core.User;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -14,5 +15,7 @@ public interface IChatServer extends Remote {
     // Utility
     public String ping() throws RemoteException;
     
-    public void sendMessage(String msg);
+    public User connect(IChatClient client) throws RemoteException;
+    public void disconnect(IChatClient client) throws RemoteException;
+    public void sendMessage(String msg) throws RemoteException;
 }

@@ -1,0 +1,1 @@
+java -server -Djava.security.policy=security.policy -Djava.rmi.server.hostname=127.0.0.1 -cp target\classes edu.gu.hajo.chat.server.Main 6666 7777
