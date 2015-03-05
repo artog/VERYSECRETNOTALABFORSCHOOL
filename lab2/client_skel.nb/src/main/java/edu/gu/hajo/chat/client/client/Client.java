@@ -41,7 +41,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void ping() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // Just checking if its alive
     }
 
     @Override

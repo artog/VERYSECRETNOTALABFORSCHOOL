@@ -6,8 +6,9 @@ import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -28,12 +29,12 @@ public class Server implements IChatServer {
 
     private final Chat chat;
 
-    private final List<IChatClient> clients = new ArrayList();
+    private final Map<String,IChatClient> clients = new HashMap();
     
     public Server(Chat chat) {
         this.chat = chat;
         Timer pingTimer = new Timer(true);
-        pingTimer.schedule(pinger, 0, PING_DELAY);
+        pingTimer.schedule(pinger, PING_DELAY, PING_DELAY);
     }
 
     // ------- IServer ---------------------------------------------
@@ -50,12 +51,13 @@ public class Server implements IChatServer {
         @Override
         public void run() {
             synchronized (clients) {
-                for (int i = 0; i < clients.size();i++) {
+                Set<String> keys = clients.keySet();
+                
+                for (String key : keys) {
                     try {
-                        clients.get(i).ping();
+                        clients.get(key).ping();
                     } catch (RemoteException ex) {
-                        clients.remove(i);
-                        i--;
+                        disconnectUser(key);
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -72,9 +74,13 @@ public class Server implements IChatServer {
     @Override
     public User connect(IChatClient client) throws RemoteException {
         User user = chat.login(client.getLogin(), client.getPassword());
-        
         if(user != null){
-            clients.add(client);
+            
+            clients.put(
+                client.getLogin(),
+                client
+            );
+            
             System.out.println(client.getLogin() + " has connected.");
         }
         else{
@@ -82,6 +88,20 @@ public class Server implements IChatServer {
         }
         
         return user;
+    }
+
+    @Override
+    public void disconnect(IChatClient client) throws RemoteException {
+        disconnectUser(client.getLogin());
+    }
+    
+    
+    
+    
+    
+    private void disconnectUser(String key) {
+        chat.logout(chat.getUser(key));
+        clients.remove(key);
     }
 }
 
