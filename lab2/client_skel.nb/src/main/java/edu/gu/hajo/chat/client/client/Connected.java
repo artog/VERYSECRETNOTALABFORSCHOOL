@@ -16,6 +16,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -40,6 +42,14 @@ public class Connected implements IState{
 
     @Override
     public void disconnect() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            server.disconnect(client);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, null, ex);
+            // Wat?
+            ex.printStackTrace();
+        }
+        
+        context.set(new Disconnected(context));
     }
 }
