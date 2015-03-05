@@ -53,6 +53,22 @@ public class Server implements IChatServer {
 
     @Override
     public void sendMessage(String msg){
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // TODO: stuff...
+    }
+
+    @Override
+    public User connect(IChatClient client) throws RemoteException {
+        User user = chat.login(client.getLogin(), client.getPassword());
+        
+        if(user != null){
+            clients.add(client);
+            System.out.println(client.getLogin() + " has connected.");
+        }
+        else{
+            System.out.println("Failed attempt to login."); 
+        }
+        
+        return user;
     }
 }
+

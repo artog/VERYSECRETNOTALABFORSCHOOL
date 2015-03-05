@@ -8,6 +8,7 @@ import edu.gu.hajo.chat.server.core.User;
 import java.io.Serializable;
 
 import static edu.gu.hajo.chat.client.client.IObserver.Event;
+import java.rmi.RemoteException;
 
 /**
  * Implementation of many interfaces. Serializable important!
@@ -54,7 +55,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     }
 
     @Override
-    public void message() {
+    public void message(){
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -66,6 +67,16 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     @Override
     public void disconnect() {
         context.set(new Disconnected());
+    }
+
+    @Override
+    public String getLogin() throws RemoteException {
+        return login;
+    }
+
+    @Override
+    public String getPassword() throws RemoteException {
+        return passwd;
     }
 
 }

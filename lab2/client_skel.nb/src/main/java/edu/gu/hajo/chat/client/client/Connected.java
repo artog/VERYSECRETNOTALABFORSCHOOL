@@ -9,14 +9,12 @@ import edu.gu.hajo.chat.client.util.ChatClientOptions;
 import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
-import java.net.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
@@ -40,11 +38,13 @@ public class Connected implements IState{
             UnicastRemoteObject.exportObject(client,
                     ChatClientOptions.getConnection().getMyPort());
             
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        } catch (NotBoundException ex){
+            server.connect(client);
+            
+        } catch (RemoteException | NotBoundException ex) {
             ex.printStackTrace();
         }
+        
+        
         
         System.out.println("New Connected was born!"); //TODO: remove this
     }
