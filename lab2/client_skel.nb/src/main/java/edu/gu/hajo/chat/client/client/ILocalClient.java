@@ -1,5 +1,7 @@
 package edu.gu.hajo.chat.client.client;
 
+import java.util.List;
+
 
 /**
  * The Client seen from the GUI.
@@ -9,4 +11,7 @@ package edu.gu.hajo.chat.client.client;
 public interface ILocalClient {
     public void connect();
     public void disconnect();
+    
+    public List<String> getFileListFromPeer(String peer);
+    public void download(String filename, String username);
 }

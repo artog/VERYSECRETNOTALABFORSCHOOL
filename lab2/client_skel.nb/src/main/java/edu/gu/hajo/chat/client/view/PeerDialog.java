@@ -70,7 +70,7 @@ public class PeerDialog extends JDialog implements ActionListener {
         if (fileName == null) {
             return;
         }
-       
+        client.download(fileName, peerLogin);
     }
 
     private final WindowListener windowListener = new WindowAdapter() {
@@ -97,7 +97,8 @@ public class PeerDialog extends JDialog implements ActionListener {
         files.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         files.setPreferredSize(new Dimension(200, 280));
         files.setBackground(Color.WHITE);
-        files.setListData(new Object[]{"No files"});
+        Object[] fileList = client.getFileListFromPeer(peerLogin).toArray();
+        files.setListData(fileList);
         p.add(files);
         return p;
     }

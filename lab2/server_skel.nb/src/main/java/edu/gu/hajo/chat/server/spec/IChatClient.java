@@ -2,6 +2,7 @@ package edu.gu.hajo.chat.server.spec;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 /**
  * Contract for client (from Server view). Call backs from server
@@ -20,4 +21,6 @@ public interface IChatClient extends Remote {
     
     public String getLogin() throws RemoteException;
     public String getPassword() throws RemoteException; //Very secure.
+    
+    public List<String> getFilelist() throws RemoteException;
 }

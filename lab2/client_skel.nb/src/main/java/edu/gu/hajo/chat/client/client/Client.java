@@ -8,7 +8,14 @@ import edu.gu.hajo.chat.server.core.User;
 import java.io.Serializable;
 
 import static edu.gu.hajo.chat.client.client.IObserver.Event;
+import edu.gu.hajo.chat.client.exception.ChatClientException;
+import edu.gu.hajo.chat.client.io.FileHandler;
+import edu.gu.hajo.chat.server.io.ChatFile;
+import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementation of many interfaces. Serializable important!
@@ -87,5 +94,54 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     public void setUser(User user){
         me = user;
     }
+
+    @Override
+    public List<String> getFilelist() throws RemoteException {
+        try {
+            return FileHandler.listDirectoryContent(
+                    ChatClientOptions.getUploadPath()
+            );
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getFileListFromPeer(String peer) {
+        return context.getFileListFromPeer(peer);
+    }
+
+    @Override
+    public ChatFile getFile(String name) throws RemoteException {
+        try {
+            
+            byte[] bytes = FileHandler.readFile(
+                    ChatClientOptions.getUploadPath(),
+                    name
+            );
+            ChatFile file = new ChatFile(name, bytes);
+            return file;
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+
+    @Override
+    public void download(String filename, String username) {
+        try {
+            context.download(filename,username);
+        } catch (ChatClientException ex) {
+            publishSwing(Event.EXCEPTION, ex.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    
 
 }

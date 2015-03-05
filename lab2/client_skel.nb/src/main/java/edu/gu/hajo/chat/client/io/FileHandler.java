@@ -22,7 +22,11 @@ public final class FileHandler {
     }
 
     public static void saveFile(Path path, String fileName, byte[] data) throws IOException {
-        Files.write(path.resolve(fileName), data);
+        if (!path.toFile().exists()) {
+            path.toFile().mkdir();
+        }
+        final Path filepath = path.resolve(fileName);
+        Files.write(filepath, data);
     }
 
     public static List<String> listDirectoryContent(Path path) throws IOException {

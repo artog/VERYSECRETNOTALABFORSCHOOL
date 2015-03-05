@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 /**
  *
@@ -56,6 +57,19 @@ public class Disconnected implements IState{
 
     @Override
     public void disconnect() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //TODO: Error
     }
+
+    @Override
+    public List<String> getFileListFromPeer(String peer) {
+        return null;
+    }
+
+    @Override
+    public void download(String filename, String username) {
+        //TODO: Error
+    }
+    
+     
+    
 }

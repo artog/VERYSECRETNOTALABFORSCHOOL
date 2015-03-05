@@ -5,6 +5,7 @@ import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
+import edu.gu.hajo.chat.server.spec.IPeer;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -119,11 +120,26 @@ public class Server implements IChatServer {
                 try {
                     c.userLeft(key);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    // Skip, ping will take care of dead client.
                 }
             }
         }
         LOG.log(Level.INFO, "{0} has disconnected.", key);
     }
+
+    @Override
+    public List<String> getFilelistFromUser(String username) throws RemoteException {
+        User user = chat.getUser(username);
+        if (chat.isLoggedIn(user)) {
+            return clients.get(username).getFilelist();
+        } else {
+            return null;
+        }
+    }
+    
+    public IPeer getUserForFile(String name) {
+        return (IPeer) clients.get(name);
+    }
+
 }
 
