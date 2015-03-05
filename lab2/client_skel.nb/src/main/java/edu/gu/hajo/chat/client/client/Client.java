@@ -62,6 +62,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     @Override
     public void connect() {
         context.set(new Connected(this));
+        publishSwing(Event.CONNECTED, me);
     }
 
     @Override
@@ -77,6 +78,10 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     @Override
     public String getPassword() throws RemoteException {
         return passwd;
+    }
+    
+    public void setUser(User user){
+        me = user;
     }
 
 }

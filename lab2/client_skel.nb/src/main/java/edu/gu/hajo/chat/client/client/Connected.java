@@ -22,9 +22,9 @@ import java.rmi.server.UnicastRemoteObject;
  */
 public class Connected implements IState{
     private IChatServer server;
-    private IChatClient client;
+    private Client client;
     
-    public Connected(IChatClient client){
+    public Connected(Client client){
 
         try {
             Registry registry = LocateRegistry.getRegistry(
@@ -38,7 +38,7 @@ public class Connected implements IState{
             UnicastRemoteObject.exportObject(client,
                     ChatClientOptions.getConnection().getMyPort());
             
-            server.connect(client);
+            client.setUser(server.connect(client));
             
         } catch (RemoteException | NotBoundException ex) {
             ex.printStackTrace();
