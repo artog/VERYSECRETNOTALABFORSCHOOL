@@ -3,17 +3,11 @@ package edu.gu.hajo.chat.server.service;
 import edu.gu.hajo.chat.server.core.Chat;
 import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.spec.IChatClient;
-import edu.gu.hajo.chat.server.spec.IPeer;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
-import edu.gu.hajo.chat.server.spec.IMessage;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -38,6 +32,8 @@ public class Server implements IChatServer {
     
     public Server(Chat chat) {
         this.chat = chat;
+        Timer pingTimer = new Timer(true);
+        pingTimer.schedule(pinger, 0, PING_DELAY);
     }
 
     // ------- IServer ---------------------------------------------
@@ -49,7 +45,24 @@ public class Server implements IChatServer {
 
     // --------- Privates -----------
     // Clients alive?
-    private final TimerTask pinger = null;
+    private final TimerTask pinger = new TimerTask() {
+
+        @Override
+        public void run() {
+            synchronized (clients) {
+                for (int i = 0; i < clients.size();i++) {
+                    try {
+                        clients.get(i).ping();
+                    } catch (RemoteException ex) {
+                        clients.remove(i);
+                        i--;
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        
+    };
 
     @Override
     public void sendMessage(String msg){
