@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class Client implements ILocalClient, IChatClient, IPeer,
         Serializable {
 
-    private final transient StateContext context = null;
+    private final transient StateContext context = new StateContext();
 
     // The logged in user
     private User me;
@@ -54,6 +54,16 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     @Override
     public void message() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void connect() {
+        context.set(new Connected());
+    }
+
+    @Override
+    public void disconnect() {
+        context.set(new Disconnected());
     }
 
 }

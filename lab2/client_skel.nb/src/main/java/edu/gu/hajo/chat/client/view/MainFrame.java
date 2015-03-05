@@ -40,7 +40,7 @@ public class MainFrame extends JFrame implements ActionListener, IObserver {
     public static final String CONNECT_CMD = "connect";
     public static final String DISCONNECT_CMD = "disconnect";
 
-    private ILocalClient client;
+    private ILocalClient client = new Client(this);
     private final JButton connect = new JButton("Connect");
     private final JButton disconnect = new JButton("Disconnect");
     private final JTextArea messages = new JTextArea();
@@ -62,13 +62,13 @@ public class MainFrame extends JFrame implements ActionListener, IObserver {
                 send.setText("");
                 break;
             case CONNECT_CMD:
-                client = new Client(this);
+                client.connect();
                 
                 break;
             case DISCONNECT_CMD:
                 
                 break;
-            default:;
+            default:
         }
     }
 

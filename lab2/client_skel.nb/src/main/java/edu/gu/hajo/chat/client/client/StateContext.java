@@ -7,7 +7,9 @@ package edu.gu.hajo.chat.client.client;
  *
  */
 final class StateContext {
-
+    private IState state = new Disconnected();
     
- 
+    public void set(IState state){
+        this.state = state;
+    }
 }

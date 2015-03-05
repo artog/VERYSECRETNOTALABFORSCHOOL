@@ -8,6 +8,6 @@ package edu.gu.hajo.chat.client.client;
  * @author hajo
  *
  */
-public interface IState { // Yes, I do.
+public interface IState { // Yes, I do. <-- No jokes in code file, bad programming style!
     
 }
