@@ -7,6 +7,8 @@ package edu.gu.hajo.chat.client.client;
 
 import edu.gu.hajo.chat.client.util.ChatClientOptions;
 import edu.gu.hajo.chat.server.core.Constants;
+import edu.gu.hajo.chat.server.core.User;
+import edu.gu.hajo.chat.server.service.Server;
 import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import java.rmi.NotBoundException;
@@ -21,31 +23,23 @@ import java.rmi.server.UnicastRemoteObject;
  * @author Mikael
  */
 public class Connected implements IState{
+    private StateContext context;
     private IChatServer server;
     private Client client;
     
-    public Connected(Client client){
+    public Connected(StateContext context, Client client, Server server){
+        this.context = context;
 
-        try {
-            Registry registry = LocateRegistry.getRegistry(
-                ChatClientOptions.getConnection().getRegistryIp(),
-                ChatClientOptions.getConnection().getRegistryPort()
-            );
-            
-            server = (IChatServer) registry.lookup(Constants.SERVER_NAME);
-            this.client = client;
-            
-            UnicastRemoteObject.exportObject(client,
-                    ChatClientOptions.getConnection().getMyPort());
-            
-            client.setUser(server.connect(client));
-            
-        } catch (RemoteException | NotBoundException ex) {
-            ex.printStackTrace();
-        }
-        
-        
-        
         System.out.println("New Connected was born!"); //TODO: remove this
+    }
+
+    @Override
+    public User connect(Client client) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void disconnect() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

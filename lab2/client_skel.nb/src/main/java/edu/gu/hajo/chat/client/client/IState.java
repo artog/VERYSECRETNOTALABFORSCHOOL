@@ -1,5 +1,7 @@
 package edu.gu.hajo.chat.client.client;
 
+import edu.gu.hajo.chat.server.core.User;
+
 
 
 /**
@@ -9,5 +11,6 @@ package edu.gu.hajo.chat.client.client;
  *
  */
 public interface IState {
-    
+    public User connect(Client client);
+    public void disconnect();
 }
