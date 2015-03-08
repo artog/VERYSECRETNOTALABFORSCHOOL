@@ -64,7 +64,13 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void send(String message){
-        context.send(me, message);
+        try{
+            context.send(me, message);
+        }
+        catch(ChatClientException ex){
+            publishSwing(Event.DISCONNECTED, "");
+            publishSwing(Event.EXCEPTION, ex.getMessage());
+        }
     }
     
     @Override

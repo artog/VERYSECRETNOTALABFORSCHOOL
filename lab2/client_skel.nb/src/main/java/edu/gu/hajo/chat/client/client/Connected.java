@@ -68,7 +68,7 @@ public class Connected implements IState{
         try {
             server.message(sender, message);
         } catch (RemoteException ex) {
-            Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, null, ex); // TODO: Change this!
+            throw new ChatClientException("Disconnected from server.");
         }
     }
 

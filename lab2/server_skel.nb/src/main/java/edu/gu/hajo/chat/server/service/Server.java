@@ -64,7 +64,6 @@ public class Server implements IChatServer {
                     client.ping();
                 } catch (Exception ex) {
                     deadClients.add(login);
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex); //What is the log message here???
                 }
             });
 
