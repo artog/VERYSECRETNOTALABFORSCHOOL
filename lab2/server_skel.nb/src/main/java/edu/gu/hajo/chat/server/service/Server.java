@@ -67,7 +67,7 @@ public class Server implements IChatServer {
                 }
             });
 
-            deadClients.forEach(login -> disconnectUser(login));
+            deadClients.forEach(login -> disconnect(login));
         }
     };
     
@@ -80,7 +80,7 @@ public class Server implements IChatServer {
             try {
                 client.recieve(message);
             } catch (RemoteException ex) {
-                disconnectUser(login);
+                disconnect(login);
             }
         });
     }
@@ -106,10 +106,10 @@ public class Server implements IChatServer {
 
     @Override
     public void disconnect(User user) throws RemoteException {
-        disconnectUser(user.getLogin());
+        disconnect(user.getLogin());
     }
     
-    private void disconnectUser(String key) {
+    private void disconnect(String key) {
         chat.logout(chat.getUser(key));
         clients.remove(key);
         synchronized (clients) {

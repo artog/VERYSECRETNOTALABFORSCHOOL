@@ -80,10 +80,15 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void connect() {
-        me = context.connect(this, LOGIN, PASSWORD);
+        try{
+            me = context.connect(this, LOGIN, PASSWORD);
         
-        if(me != null){
-            publishSwing(Event.CONNECTED, me);
+            if(me != null){
+                publishSwing(Event.CONNECTED, me);
+            }
+        }
+        catch(ChatClientException ex){
+            publishSwing(Event.EXCEPTION, ex.getMessage());
         }
     }
 

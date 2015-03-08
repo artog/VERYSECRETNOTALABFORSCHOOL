@@ -5,6 +5,7 @@
  */
 package edu.gu.hajo.chat.client.client;
 
+import edu.gu.hajo.chat.client.exception.ChatClientException;
 import edu.gu.hajo.chat.client.util.ChatClientOptions;
 import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.core.User;
@@ -50,7 +51,7 @@ public class Disconnected implements IState{
             }
             
         } catch (RemoteException | NotBoundException ex) {
-            ex.printStackTrace();
+            throw new ChatClientException("Unable to reach server.");
         }
         return user;
     }
@@ -62,7 +63,7 @@ public class Disconnected implements IState{
     
     @Override
     public void send(User sender, String message){
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new ChatClientException("Disconnected from server.");
     }
 
     @Override
