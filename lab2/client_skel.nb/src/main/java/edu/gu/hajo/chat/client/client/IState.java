@@ -12,8 +12,10 @@ import java.util.List;
  *
  */
 public interface IState {
-    public User connect(Client client);
-    public void disconnect();
+    public User connect(Client client, String login, String password);
+    public void disconnect(User user);
+    
+    public void send(User sender, String message);
     
     public List<String> getFileListFromPeer(String peer);
     

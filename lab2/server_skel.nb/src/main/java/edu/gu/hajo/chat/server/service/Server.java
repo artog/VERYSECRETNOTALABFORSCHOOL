@@ -1,10 +1,12 @@
 package edu.gu.hajo.chat.server.service;
 
 import edu.gu.hajo.chat.server.core.Chat;
+import edu.gu.hajo.chat.server.core.ChatMessage;
 import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
+import edu.gu.hajo.chat.server.spec.IMessage;
 import edu.gu.hajo.chat.server.spec.IPeer;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -55,46 +57,46 @@ public class Server implements IChatServer {
 
         @Override
         public void run() {
-            Set<String> keys = clients.keySet();
             List<String> deadClients = new ArrayList();
-            
-            for (String key : keys) {
+
+            clients.forEach((login, client) -> {
                 try {
-                    clients.get(key).ping();
+                    client.ping();
                 } catch (Exception ex) {
-                    deadClients.add(key);
-                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                    deadClients.add(login);
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex); //What is the log message here???
                 }
-            }
-            for (String key : deadClients) {
-                disconnectUser(key);
-            }
+            });
+
+            deadClients.forEach(login -> disconnectUser(login));
         }
-        
     };
+    
 
     @Override
-    public void sendMessage(String msg){
-        // TODO: stuff...
+    public void message(User sender, String msg){
+        IMessage message = new ChatMessage(null, sender, msg);
+        
+        clients.forEach((login, client) -> {
+            try {
+                client.recieve(message);
+            } catch (RemoteException ex) {
+                disconnectUser(login);
+            }
+        });
     }
 
     @Override
-    public User connect(IChatClient client) throws RemoteException {
-        User user = chat.login(client.getLogin(), client.getPassword());
+    public User connect(IChatClient client, String login, String password) throws RemoteException {
+        User user = chat.login(login, password);
         if(user != null){
+            clients.put(login, client);
+            
             for (IChatClient c : clients.values()) {
-                c.userJoined(client.getLogin());
+                c.userJoined(login);
             }
-            
-            clients.put(
-                client.getLogin(),
-                client
-            );
-            
-            for (Entry<String,IChatClient> e : clients.entrySet()) {
-                client.userJoined(e.getKey());
-            }
-            LOG.log(Level.INFO, "{0} has connected.", client.getLogin());
+
+            LOG.log(Level.INFO, "{0} has connected.", login);
         }
         else{
             LOG.log(Level.INFO, "Failed to login.");
@@ -104,13 +106,9 @@ public class Server implements IChatServer {
     }
 
     @Override
-    public void disconnect(IChatClient client) throws RemoteException {
-        disconnectUser(client.getLogin());
+    public void disconnect(User user) throws RemoteException {
+        disconnectUser(user.getLogin());
     }
-    
-    
-    
-    
     
     private void disconnectUser(String key) {
         chat.logout(chat.getUser(key));

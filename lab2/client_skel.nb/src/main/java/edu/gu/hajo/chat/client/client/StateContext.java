@@ -17,12 +17,12 @@ final class StateContext {
         this.state = state;
     }
     
-    public User connect(Client client){
-        return state.connect(client);
+    public User connect(Client client, String login, String password){
+        return state.connect(client, login, password);
     }
     
-    public void disconnect(){
-        state.disconnect();
+    public void disconnect(User user){
+        state.disconnect(user);
     }
     
     public List<String> getFileListFromPeer(String peer) {
@@ -33,5 +33,9 @@ final class StateContext {
             throws ChatClientException
     {
         state.download(filename,username);
+    }
+    
+    public void send(User sender, String message){
+        state.send(sender, message);
     }
 }

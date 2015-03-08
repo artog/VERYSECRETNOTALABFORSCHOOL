@@ -30,7 +30,7 @@ public class Disconnected implements IState{
     }
 
     @Override
-    public User connect(Client client) {
+    public User connect(Client client, String login, String password) {
         User user = null;
         try {
             Registry registry = LocateRegistry.getRegistry(
@@ -43,7 +43,7 @@ public class Disconnected implements IState{
             UnicastRemoteObject.exportObject(client,
                     ChatClientOptions.getConnection().getMyPort());
             
-            user = server.connect(client);
+            user = server.connect(client, login, password);
             
             if(user != null){
                 context.set(new Connected(context, client, server));
@@ -56,8 +56,13 @@ public class Disconnected implements IState{
     }
 
     @Override
-    public void disconnect() {
-        //TODO: Error
+    public void disconnect(User userS) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    @Override
+    public void send(User sender, String message){
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

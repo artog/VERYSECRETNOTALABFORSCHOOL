@@ -16,9 +16,9 @@ public interface IChatServer extends Remote {
     // Utility
     public String ping() throws RemoteException;
     
-    public User connect(IChatClient client) throws RemoteException;
-    public void disconnect(IChatClient client) throws RemoteException;
-    public void sendMessage(String msg) throws RemoteException;
+    public User connect(IChatClient client, String login, String password) throws RemoteException;
+    public void disconnect(User user) throws RemoteException;
+    public void message(User sender, String msg) throws RemoteException;
     
     public List<String> getFilelistFromUser(String username) throws RemoteException;
     public IPeer getUserForFile(String name) throws RemoteException;

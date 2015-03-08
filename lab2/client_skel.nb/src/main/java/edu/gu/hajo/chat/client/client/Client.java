@@ -11,6 +11,7 @@ import static edu.gu.hajo.chat.client.client.IObserver.Event;
 import edu.gu.hajo.chat.client.exception.ChatClientException;
 import edu.gu.hajo.chat.client.io.FileHandler;
 import edu.gu.hajo.chat.server.io.ChatFile;
+import edu.gu.hajo.chat.server.spec.IMessage;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -29,8 +30,8 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     // The logged in user
     private User me;
-    private final String login = ChatClientOptions.getLogin();
-    private final String passwd = ChatClientOptions.getPasswd();
+    private final String LOGIN = ChatClientOptions.getLogin();
+    private final String PASSWORD = ChatClientOptions.getPasswd();
     private final IObserver observer;
 
     public Client(IObserver observer) {
@@ -62,13 +63,18 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     }
 
     @Override
-    public void message(){
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void send(String message){
+        context.send(me, message);
+    }
+    
+    @Override
+    public void recieve(IMessage message){
+        publishSwing(Event.MESSAGE, message);
     }
 
     @Override
     public void connect() {
-        me = context.connect(this);
+        me = context.connect(this, LOGIN, PASSWORD);
         
         if(me != null){
             publishSwing(Event.CONNECTED, me);
@@ -77,18 +83,8 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void disconnect() {
-        context.disconnect();
+        context.disconnect(me);
         publishSwing(Event.DISCONNECTED, "");
-    }
-
-    @Override
-    public String getLogin() throws RemoteException {
-        return login;
-    }
-
-    @Override
-    public String getPassword() throws RemoteException {
-        return passwd;
     }
     
     public void setUser(User user){

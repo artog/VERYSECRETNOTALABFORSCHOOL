@@ -17,10 +17,7 @@ public interface IChatClient extends Remote {
     public void userLeft(String user) throws RemoteException;
     public void userJoined(String user) throws RemoteException;
 
-    public void message() throws RemoteException;
-    
-    public String getLogin() throws RemoteException;
-    public String getPassword() throws RemoteException; //Very secure.
+    public void recieve(IMessage msg) throws RemoteException;
     
     public List<String> getFilelist() throws RemoteException;
 }

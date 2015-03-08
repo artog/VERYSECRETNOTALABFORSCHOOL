@@ -45,14 +45,14 @@ public class Connected implements IState{
     }
 
     @Override
-    public User connect(Client client) {
+    public User connect(Client client, String login, String password) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void disconnect() {
+    public void disconnect(User user) {
         try {
-            server.disconnect(client);
+            server.disconnect(user);
             UnicastRemoteObject.unexportObject(client, true);
         } catch (RemoteException ex) {
             Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, null, ex);
@@ -61,6 +61,15 @@ public class Connected implements IState{
         }
         
         context.set(new Disconnected(context));
+    }
+    
+    @Override
+    public void send(User sender, String message){
+        try {
+            server.message(sender, message);
+        } catch (RemoteException ex) {
+            Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, null, ex); // TODO: Change this!
+        }
     }
 
     @Override

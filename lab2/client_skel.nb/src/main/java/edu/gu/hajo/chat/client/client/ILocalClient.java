@@ -12,6 +12,8 @@ public interface ILocalClient {
     public void connect();
     public void disconnect();
     
+    public void send(String message);
+    
     public List<String> getFileListFromPeer(String peer);
     public void download(String filename, String username);
 }
