@@ -9,7 +9,14 @@ import java.io.Serializable;
 
 import static edu.gu.hajo.chat.client.client.IObserver.Event;
 import edu.gu.hajo.chat.client.exception.ChatClientException;
+import edu.gu.hajo.chat.client.io.FileHandler;
+import edu.gu.hajo.chat.server.io.ChatFile;
+import edu.gu.hajo.chat.server.spec.IMessage;
+import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementation of many interfaces. Serializable important!
@@ -23,8 +30,8 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     // The logged in user
     private User me;
-    private final String login = ChatClientOptions.getLogin();
-    private final String passwd = ChatClientOptions.getPasswd();
+    private final String LOGIN = ChatClientOptions.getLogin();
+    private final String PASSWORD = ChatClientOptions.getPasswd();
     private final IObserver observer;
 
     public Client(IObserver observer) {
@@ -47,51 +54,101 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void userLeft(String user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        publishSwing(Event.USER_LEFT, user);
     }
 
     @Override
     public void userJoined(String user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        publishSwing(Event.USER_JOINED, user);
     }
 
     @Override
-    public void message(){
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void send(String message){
+        try{
+            context.send(me, message);
+        }
+        catch(ChatClientException ex){
+            publishSwing(Event.DISCONNECTED, "");
+            publishSwing(Event.EXCEPTION, ex.getMessage());
+        }
+    }
+    
+    @Override
+    public void recieve(IMessage message){
+        publishSwing(Event.MESSAGE, message);
     }
 
     @Override
     public void connect() {
-        try {
-            
-            me = context.connect(this);
-
+        try{
+            me = context.connect(this, LOGIN, PASSWORD);
+        
             if(me != null){
                 publishSwing(Event.CONNECTED, me);
             }
-        } catch (ChatClientException ex) {
+        }
+        catch(ChatClientException ex){
             publishSwing(Event.EXCEPTION, ex.getMessage());
         }
     }
 
     @Override
     public void disconnect() {
-        context.disconnect();
+        context.disconnect(me);
         publishSwing(Event.DISCONNECTED, "");
-    }
-
-    @Override
-    public String getLogin() throws RemoteException {
-        return login;
-    }
-
-    @Override
-    public String getPassword() throws RemoteException {
-        return passwd;
     }
     
     public void setUser(User user){
         me = user;
     }
+
+    @Override
+    public List<String> getFilelist() throws RemoteException {
+        try {
+            return FileHandler.listDirectoryContent(
+                    ChatClientOptions.getUploadPath()
+            );
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getFileListFromPeer(String peer) {
+        return context.getFileListFromPeer(peer);
+    }
+
+    @Override
+    public ChatFile getFile(String name) throws RemoteException {
+        try {
+            
+            byte[] bytes = FileHandler.readFile(
+                    ChatClientOptions.getUploadPath(),
+                    name
+            );
+            ChatFile file = new ChatFile(name, bytes);
+            return file;
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+
+    @Override
+    public void download(String filename, String username) {
+        try {
+            context.download(filename,username);
+        } catch (ChatClientException ex) {
+            publishSwing(Event.EXCEPTION, ex.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    
 
 }

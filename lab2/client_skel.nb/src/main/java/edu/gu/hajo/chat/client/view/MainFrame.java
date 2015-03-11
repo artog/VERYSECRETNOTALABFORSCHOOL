@@ -58,6 +58,7 @@ public class MainFrame extends JFrame implements ActionListener, IObserver {
         switch (e.getActionCommand()) {
             case SEND_CMD:
                 String msg = send.getText();
+                client.send(msg);
                
                 send.setText("");
                 break;
@@ -91,7 +92,7 @@ public class MainFrame extends JFrame implements ActionListener, IObserver {
                 break;
             case MESSAGE:
                 IMessage msg = (IMessage) data;
-                messages.append(msg.getSender().getLogin() + ":"
+                messages.append(msg.getSender().getLogin() + ": "
                         + msg.getContent() + "\n");
                 break;
             case USER_LEFT:

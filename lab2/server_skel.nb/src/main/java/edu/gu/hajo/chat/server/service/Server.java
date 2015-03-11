@@ -1,14 +1,20 @@
 package edu.gu.hajo.chat.server.service;
 
 import edu.gu.hajo.chat.server.core.Chat;
+import edu.gu.hajo.chat.server.core.ChatMessage;
 import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.spec.IChatClient;
 import edu.gu.hajo.chat.server.spec.IChatServer;
 import edu.gu.hajo.chat.server.core.User;
+import edu.gu.hajo.chat.server.spec.IMessage;
+import edu.gu.hajo.chat.server.spec.IPeer;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,39 +57,45 @@ public class Server implements IChatServer {
 
         @Override
         public void run() {
-            synchronized (clients) {
-                Set<String> keys = clients.keySet();
-                
-                for (String key : keys) {
-                    try {
-                        clients.get(key).ping();
-                    
-                    } catch (Exception ex) {
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, "User connection failed.");
-                        disconnectUser(key);
-                    }
+            List<String> deadClients = new ArrayList();
+
+            clients.forEach((login, client) -> {
+                try {
+                    client.ping();
+                } catch (Exception ex) {
+                    deadClients.add(login);
                 }
-            }
+            });
+
+            deadClients.forEach(login -> disconnect(login));
         }
-        
     };
+    
 
     @Override
-    public void sendMessage(String msg){
-        // TODO: stuff...
+    public void message(User sender, String msg){
+        IMessage message = new ChatMessage(null, sender, msg);
+        
+        clients.forEach((login, client) -> {
+            try {
+                client.recieve(message);
+            } catch (RemoteException ex) {
+                disconnect(login);
+            }
+        });
     }
 
     @Override
-    public User connect(IChatClient client) throws RemoteException {
-        User user = chat.login(client.getLogin(), client.getPassword());
+    public User connect(IChatClient client, String login, String password) throws RemoteException {
+        User user = chat.login(login, password);
         if(user != null){
+            clients.put(login, client);
             
-            clients.put(
-                client.getLogin(),
-                client
-            );
-            
-            LOG.log(Level.INFO, "{0} has connected.", client.getLogin());
+            for (IChatClient c : clients.values()) {
+                c.userJoined(login);
+            }
+
+            LOG.log(Level.INFO, "{0} has connected.", login);
         }
         else{
             LOG.log(Level.INFO, "Failed to login.");
@@ -93,18 +105,38 @@ public class Server implements IChatServer {
     }
 
     @Override
-    public void disconnect(IChatClient client) throws RemoteException {
-        disconnectUser(client.getLogin());
+    public void disconnect(User user) throws RemoteException {
+        disconnect(user.getLogin());
     }
     
-    
-    
-    
-    
-    private void disconnectUser(String key) {
+    private void disconnect(String key) {
         chat.logout(chat.getUser(key));
         clients.remove(key);
+        synchronized (clients) {
+            for (IChatClient c : clients.values()) {
+                try {
+                    c.userLeft(key);
+                } catch (RemoteException ex) {
+                    // Skip, ping will take care of dead client.
+                }
+            }
+        }
         LOG.log(Level.INFO, "{0} has disconnected.", key);
     }
+
+    @Override
+    public List<String> getFilelistFromUser(String username) throws RemoteException {
+        User user = chat.getUser(username);
+        if (chat.isLoggedIn(user)) {
+            return clients.get(username).getFilelist();
+        } else {
+            return null;
+        }
+    }
+    
+    public IPeer getUserForFile(String name) {
+        return (IPeer) clients.get(name);
+    }
+
 }
 

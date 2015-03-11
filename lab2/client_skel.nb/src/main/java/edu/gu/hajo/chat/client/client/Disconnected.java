@@ -15,7 +15,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.logging.Logger;
+import java.util.List;
 
 /**
  *
@@ -31,7 +31,7 @@ public class Disconnected implements IState{
     }
 
     @Override
-    public User connect(Client client) {
+    public User connect(Client client, String login, String password) {
         User user = null;
         try {
             Registry registry = LocateRegistry.getRegistry(
@@ -44,20 +44,38 @@ public class Disconnected implements IState{
             UnicastRemoteObject.exportObject(client,
                     ChatClientOptions.getConnection().getMyPort());
             
-            user = server.connect(client);
+            user = server.connect(client, login, password);
             
             if(user != null){
                 context.set(new Connected(context, client, server));
             }
             
         } catch (RemoteException | NotBoundException ex) {
-            throw new ChatClientException("Server not found.");
+            throw new ChatClientException("Unable to reach server.");
         }
         return user;
     }
 
     @Override
-    public void disconnect() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void disconnect(User userS) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    @Override
+    public void send(User sender, String message){
+        throw new ChatClientException("Disconnected from server.");
+    }
+
+    @Override
+    public List<String> getFileListFromPeer(String peer) {
+        return null;
+    }
+
+    @Override
+    public void download(String filename, String username) {
+        //TODO: Error
+    }
+    
+     
+    
 }
