@@ -101,6 +101,7 @@ public class MainFrame extends JFrame implements ActionListener, IObserver {
                 connected.setModel(listModel);
                 break;
             case EXCEPTION:
+            case INFO:
                 String s = (String) data;
                 JOptionPane.showMessageDialog(this, s);
                 break;

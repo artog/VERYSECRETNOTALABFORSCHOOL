@@ -45,9 +45,7 @@ public class Chat {
 
     public void broadcast(IMessage msg) {
         msg.getSender().putOutbox(msg);
-        for (User u : registred.values()) {
-            u.putInbox(msg);
-        }
+        registred.values().forEach(u -> u.putInbox(msg));
     }
 
     public boolean isLoggedIn(User user) {

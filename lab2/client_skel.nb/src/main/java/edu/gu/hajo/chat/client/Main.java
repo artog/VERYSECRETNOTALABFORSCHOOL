@@ -58,11 +58,8 @@ public class Main {
 
         // Construct GUI
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    new MainFrame().setVisible(true);
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                new MainFrame().setVisible(true);
             });
 
         } catch (InterruptedException | InvocationTargetException e) {

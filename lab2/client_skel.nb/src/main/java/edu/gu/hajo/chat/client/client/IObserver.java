@@ -14,6 +14,7 @@ public interface IObserver {
         USER_LEFT,
         USER_JOINED,
         EXCEPTION,
+        INFO
     }
 
     public void onEvent(Event event, Object data);

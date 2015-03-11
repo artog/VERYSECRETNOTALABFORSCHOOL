@@ -77,7 +77,7 @@ public class Client implements ILocalClient, IChatClient, IPeer,
     public void recieve(IMessage message){
         publishSwing(Event.MESSAGE, message);
     }
-
+    
     @Override
     public void connect() {
         try{
@@ -143,6 +143,10 @@ public class Client implements ILocalClient, IChatClient, IPeer,
         } catch (ChatClientException ex) {
             publishSwing(Event.EXCEPTION, ex.getMessage());
         }
+    }
+    
+    public void informUser(String msg) {
+        this.publishSwing(Event.INFO, msg);
     }
     
     

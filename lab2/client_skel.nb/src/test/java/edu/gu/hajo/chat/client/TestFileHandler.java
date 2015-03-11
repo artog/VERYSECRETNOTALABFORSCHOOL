@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -40,9 +39,7 @@ public class TestFileHandler {
         Path path = ChatClientOptions.getUploadPath();
         List<String> fileNames = FileHandler.listDirectoryContent(path);
         assertTrue( fileNames.size() > 0);
-        for(String s : fileNames){
-            System.out.println(s);
-        }
+        fileNames.forEach((s) -> System.out.println(s));
     }
     
 

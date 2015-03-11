@@ -2,6 +2,7 @@ package edu.gu.hajo.chat.server.core;
 
 import edu.gu.hajo.chat.server.spec.IMessage;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * User for chat ( a bit strange to send this over the network but example of a
@@ -38,6 +39,11 @@ public class User implements Serializable {
     void putOutbox(IMessage msg) {
         outbox.add(msg);
     }
+    
+    public List<IMessage> getMessages() {
+        return inbox.getMessages();
+    }
+    
 
     public String getLogin() {
         return login;

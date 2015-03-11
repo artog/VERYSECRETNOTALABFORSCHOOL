@@ -21,4 +21,18 @@ public class MessageBox implements Serializable {
         msgs.add(msg);
     }
     
+    public List<IMessage> getMessages() {
+        List<IMessage> copy = new ArrayList();
+        msgs.forEach((IMessage msg) -> {
+            copy.add(
+                    new ChatMessage(
+                            null,
+                            msg.getSender(),
+                            msg.getContent()
+                    )
+            );
+        });
+        return copy; 
+    }
+    
 }

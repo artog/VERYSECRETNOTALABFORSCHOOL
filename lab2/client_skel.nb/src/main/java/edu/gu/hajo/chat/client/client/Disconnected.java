@@ -21,13 +21,12 @@ import java.util.List;
  *
  * @author Mikael
  */
-public class Disconnected implements IState{
-    private StateContext context;
+class Disconnected implements IState{
+    private final StateContext context;
     
     
     public Disconnected(StateContext context){
         this.context = context;
-        System.out.println("New Disconnected was born!"); //TODO: remove this
     }
 
     @Override
@@ -48,6 +47,7 @@ public class Disconnected implements IState{
             
             if(user != null){
                 context.set(new Connected(context, client, server));
+                user.getMessages().forEach(msg -> client.recieve(msg));
             }
             
         } catch (RemoteException | NotBoundException ex) {
