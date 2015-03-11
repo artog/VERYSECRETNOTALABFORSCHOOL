@@ -1,5 +1,6 @@
 package edu.gu.hajo.chat.client.client;
 
+import edu.gu.hajo.chat.client.exception.ChatClientException;
 import edu.gu.hajo.chat.server.core.User;
 
 
@@ -11,6 +12,6 @@ import edu.gu.hajo.chat.server.core.User;
  *
  */
 public interface IState {
-    public User connect(Client client);
+    public User connect(Client client) throws ChatClientException ;
     public void disconnect();
 }

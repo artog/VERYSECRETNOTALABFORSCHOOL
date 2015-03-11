@@ -5,6 +5,7 @@
  */
 package edu.gu.hajo.chat.client.client;
 
+import edu.gu.hajo.chat.client.exception.ChatClientException;
 import edu.gu.hajo.chat.client.util.ChatClientOptions;
 import edu.gu.hajo.chat.server.core.Constants;
 import edu.gu.hajo.chat.server.core.User;
@@ -14,6 +15,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.logging.Logger;
 
 /**
  *
@@ -49,7 +51,7 @@ public class Disconnected implements IState{
             }
             
         } catch (RemoteException | NotBoundException ex) {
-            ex.printStackTrace();
+            throw new ChatClientException("Server not found.");
         }
         return user;
     }

@@ -8,6 +8,7 @@ import edu.gu.hajo.chat.server.core.User;
 import java.io.Serializable;
 
 import static edu.gu.hajo.chat.client.client.IObserver.Event;
+import edu.gu.hajo.chat.client.exception.ChatClientException;
 import java.rmi.RemoteException;
 
 /**
@@ -61,10 +62,15 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public void connect() {
-        me = context.connect(this);
-        
-        if(me != null){
-            publishSwing(Event.CONNECTED, me);
+        try {
+            
+            me = context.connect(this);
+
+            if(me != null){
+                publishSwing(Event.CONNECTED, me);
+            }
+        } catch (ChatClientException ex) {
+            publishSwing(Event.EXCEPTION, ex.getMessage());
         }
     }
 

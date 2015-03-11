@@ -57,9 +57,10 @@ public class Server implements IChatServer {
                 for (String key : keys) {
                     try {
                         clients.get(key).ping();
+                    
                     } catch (Exception ex) {
+                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, "User connection failed.");
                         disconnectUser(key);
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }

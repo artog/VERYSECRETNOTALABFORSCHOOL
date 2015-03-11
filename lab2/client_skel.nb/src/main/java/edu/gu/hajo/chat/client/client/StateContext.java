@@ -1,5 +1,6 @@
 package edu.gu.hajo.chat.client.client;
 
+import edu.gu.hajo.chat.client.exception.ChatClientException;
 import edu.gu.hajo.chat.server.core.User;
 
 /**
@@ -15,7 +16,7 @@ final class StateContext {
         this.state = state;
     }
     
-    public User connect(Client client){
+    public User connect(Client client) throws ChatClientException {
         return state.connect(client);
     }
     
