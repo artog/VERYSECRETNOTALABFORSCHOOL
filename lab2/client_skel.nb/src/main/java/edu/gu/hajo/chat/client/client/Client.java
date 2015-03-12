@@ -14,6 +14,7 @@ import edu.gu.hajo.chat.server.io.ChatFile;
 import edu.gu.hajo.chat.server.spec.IMessage;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -116,7 +117,14 @@ public class Client implements ILocalClient, IChatClient, IPeer,
 
     @Override
     public List<String> getFileListFromPeer(String peer) {
-        return context.getFileListFromPeer(peer);
+        List<String> files = new ArrayList();
+        try {
+            files = context.getFileListFromPeer(peer);
+        } catch (ChatClientException e) {
+            publishSwing(Event.DISCONNECTED, "");
+            publishSwing(Event.EXCEPTION, e.getMessage());
+        }
+        return files;
     }
 
     @Override

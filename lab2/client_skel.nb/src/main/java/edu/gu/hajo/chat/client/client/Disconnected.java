@@ -5,6 +5,7 @@
  */
 package edu.gu.hajo.chat.client.client;
 
+import com.sun.istack.internal.logging.Logger;
 import edu.gu.hajo.chat.client.exception.ChatClientException;
 import edu.gu.hajo.chat.client.util.ChatClientOptions;
 import edu.gu.hajo.chat.server.core.Constants;
@@ -16,6 +17,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  *
@@ -39,7 +41,7 @@ class Disconnected implements IState{
             );
             
             IChatServer server = (IChatServer) registry.lookup(Constants.SERVER_NAME);
-            
+                        
             UnicastRemoteObject.exportObject(client,
                     ChatClientOptions.getConnection().getMyPort());
             
@@ -58,7 +60,7 @@ class Disconnected implements IState{
 
     @Override
     public void disconnect(User userS) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new ChatClientException("Not connected to server.");
     }
     
     @Override
@@ -68,12 +70,12 @@ class Disconnected implements IState{
 
     @Override
     public List<String> getFileListFromPeer(String peer) {
-        return null;
+        throw new ChatClientException("Not connected to server.");
     }
 
     @Override
     public void download(String filename, String username) {
-        //TODO: Error
+        throw new ChatClientException("Not connected to server.");
     }
     
      

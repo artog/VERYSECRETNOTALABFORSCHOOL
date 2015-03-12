@@ -15,6 +15,7 @@ import edu.gu.hajo.chat.server.spec.IPeer;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,18 +61,19 @@ class Connected implements IState {
         try {
             server.message(sender, message);
         } catch (RemoteException ex) {
-            throw new ChatClientException("Disconnected from server.");
+            forceDisconnect();
         }
     }
 
     @Override
-    public List<String> getFileListFromPeer(String peer) {
+    public List<String> getFileListFromPeer(String peer) 
+    {
         try {
             return server.getFilelistFromUser(peer);
         } catch (RemoteException ex) {
-            Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+            forceDisconnect();
         }
+        return null;
     }
 
     @Override
@@ -113,13 +115,22 @@ class Connected implements IState {
             (new Downloader()).execute();
             
         } catch (RemoteException ex) {
-            Logger.getLogger(Connected.class.getName()).log(Level.SEVERE, "Unable to connect to client.", ex);
-            throw new ChatClientException("Unable to connect to client.");
+            forceDisconnect();
         }
             
     }
     
-    
+    private void forceDisconnect() 
+        throws ChatClientException
+    {
+        try {
+            UnicastRemoteObject.unexportObject(client, true);
+        } catch (Exception e) {
+            // All is well.
+        }
+        context.set(new Disconnected(context));
+        throw new ChatClientException("Unable to connect to client.");
+    }
     
     
 }
