@@ -1,5 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-trie.nb,edu.gu.hajo.trie,TrieNode,2,112,0,10,1,32,1,13,1,8
-trie.nb,edu.gu.hajo.trie,ConnectableTrie,0,177,1,21,0,39,1,17,0,7
-trie.nb,edu.gu.hajo.trie,ConnectableTrieFactory,3,4,0,0,1,1,1,1,1,1
-trie.nb,edu.gu.hajo.trie,Connector,0,12,0,0,0,5,0,2,0,2

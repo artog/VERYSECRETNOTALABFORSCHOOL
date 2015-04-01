@@ -1,5 +1,4 @@
-*.class
-
+	
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
@@ -10,8 +9,10 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/lab1/dictionary.nb/target/
-/lab1/trie.nb/target/
-/lab1/translator.nb/target/
-/lab2/client_skel.nb/target/
-/lab2/server_skel.nb/target/
+/DIT950/lab1/dictionary.nb/target/
+/DIT950/dictionary.nb/target/
+/DIT950/lab1/trie.nb/target/
+/DIT950/trie.nb/target/
+/DIT950/lab1/translator.nb/target/
+/DIT950/lab2/client_skel.nb/target/
+/DIT950/lab2/server_skel.nb/target/
