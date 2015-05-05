@@ -1,10 +1,21 @@
+
+import java.util.Arrays;
+
 public class Lab1 {
     /** Sorting algorithms **/
 
-    // Insertion sort.
-
+    /**
+     * Insertion sort.
+     * @param array 
+     */
     public static void insertionSort(int[] array) {
-        throw new UnsupportedOperationException();
+        for (int i = 1; i < array.length; i++) {
+            int k = i;
+            while (k > 0 && array[k] < array[k-1]) {
+                swap(array,k,k-1);
+                k--;
+            }
+        }
     }
 
     // Quicksort.
@@ -15,14 +26,17 @@ public class Lab1 {
 
     // Quicksort part of an array
     private static void quickSort(int[] array, int begin, int end) {
+//        System.out.printf("Sorting %s from %d to %d%n",Arrays.toString(array),begin,end);
         // Base case.
         if (begin >= end) return;
 
         // Partition the array.
         int pivot = partition(array, begin, end);
-
+//        System.out.println("Pivot at: "+pivot);
+//        System.out.println("After partition: "+Arrays.toString(array));
         // Now recursively quicksort the two partitions.
-        throw new UnsupportedOperationException();
+        quickSort(array, begin, pivot - 1);
+        quickSort(array, pivot + 1, end);
     }
 
     // Partition part of an array, and return the index where the pivot
@@ -31,8 +45,18 @@ public class Lab1 {
         // array[begin] will be the pivot element
         int low = begin+1;
         int high = end;
-
-        throw new UnsupportedOperationException();
+//        System.out.printf("Part: l:%d h:%d %n",low,high);
+        while (low <= high) {
+            if (array[low] <= array[begin]) {
+                low++;
+            } else {
+                swap(array,low,high);
+                high--;
+            }
+//            System.out.printf("Part: l:%d h:%d %n",low,high);
+        }
+        swap(array, low-1, begin);
+        return low-1;
     }
 
     // Swap two elements in an array
@@ -40,6 +64,8 @@ public class Lab1 {
         int x = array[i];
         array[i] = array[j];
         array[j] = x;
+//        System.out.printf("Swap %d with %d %n",i,j);
+//        System.out.println("Now: "+Arrays.toString(array));
     }
 
     // Mergesort.
@@ -62,7 +88,11 @@ public class Lab1 {
 
         // Recursively sort both halves of the array,
         // then merge the results.
-        throw new UnsupportedOperationException();
+        
+        return merge(
+                mergeSort(array,begin,mid), // Left
+                mergeSort(array,mid+1,end)    // Right
+        );
     }
 
     // Merge two sorted arrays into one
@@ -77,7 +107,37 @@ public class Lab1 {
         int nextRight = 0;
 
         // Idea: repeatedly copy one element from either the left or right array to the result array.
-        throw new UnsupportedOperationException();
+        while (nextResult < result.length) {
+            
+            if (left.length == nextLeft) {
+               while (nextRight < right.length) {
+                    result[nextResult++] = right[nextRight++]; 
+                }
+               break;
+            }
+            
+            if (right.length == nextRight) {
+               while (nextLeft < left.length) {
+                    result[nextResult++] = left[nextLeft++]; 
+                }
+               break;
+            }
+            
+            if (left[nextLeft] < right[nextRight]) {
+                result[nextResult++] = left[nextLeft++];
+            } else {
+                result[nextResult++] = right[nextRight++];
+            }
+        }
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        int[] a = {3,2,1,0};
+        System.out.println(Arrays.toString(a));
+        mergeSort(a);
+        System.out.println(Arrays.toString(a));
+        
     }
 }
 
