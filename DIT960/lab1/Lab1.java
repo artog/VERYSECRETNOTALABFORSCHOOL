@@ -1,5 +1,5 @@
-
 import java.util.Arrays;
+
 
 public class Lab1 {
     /** Sorting algorithms **/
@@ -10,11 +10,20 @@ public class Lab1 {
      */
     public static void insertionSort(int[] array) {
         for (int i = 1; i < array.length; i++) {
-            int k = i;
-            while (k > 0 && array[k] < array[k-1]) {
-                swap(array,k,k-1);
+            int k = i-1;
+
+            int element = array[i];
+
+            while (k >= 0) {
+                
+                if (element < array[k]) {
+                    array[k+1] = array[k]; 
+                } else {
+                    break;
+                }
                 k--;
             }
+            array[k+1] = element;
         }
     }
 
@@ -26,14 +35,12 @@ public class Lab1 {
 
     // Quicksort part of an array
     private static void quickSort(int[] array, int begin, int end) {
-//        System.out.printf("Sorting %s from %d to %d%n",Arrays.toString(array),begin,end);
         // Base case.
         if (begin >= end) return;
 
         // Partition the array.
         int pivot = partition(array, begin, end);
-//        System.out.println("Pivot at: "+pivot);
-//        System.out.println("After partition: "+Arrays.toString(array));
+
         // Now recursively quicksort the two partitions.
         quickSort(array, begin, pivot - 1);
         quickSort(array, pivot + 1, end);
@@ -45,16 +52,18 @@ public class Lab1 {
         // array[begin] will be the pivot element
         int low = begin+1;
         int high = end;
-//        System.out.printf("Part: l:%d h:%d %n",low,high);
+        
         while (low <= high) {
             if (array[low] <= array[begin]) {
                 low++;
+            } else if (array[high] > array[begin]) {
+                high--;
             } else {
                 swap(array,low,high);
-                high--;
+                // high--;
             }
-//            System.out.printf("Part: l:%d h:%d %n",low,high);
         }
+
         swap(array, low-1, begin);
         return low-1;
     }
@@ -64,8 +73,6 @@ public class Lab1 {
         int x = array[i];
         array[i] = array[j];
         array[j] = x;
-//        System.out.printf("Swap %d with %d %n",i,j);
-//        System.out.println("Now: "+Arrays.toString(array));
     }
 
     // Mergesort.
@@ -100,44 +107,30 @@ public class Lab1 {
         // The result array
         int[] result = new int[left.length + right.length];
         // How far we have got in the result array
-        int nextResult = 0;
+        int i = 0;
         // How far we have got in the left array
-        int nextLeft = 0;
+        int j = 0;
         // How far we have got in the right array
-        int nextRight = 0;
+        int k = 0;
 
-        // Idea: repeatedly copy one element from either the left or right array to the result array.
-        while (nextResult < result.length) {
-            
-            if (left.length == nextLeft) {
-               while (nextRight < right.length) {
-                    result[nextResult++] = right[nextRight++]; 
-                }
-               break;
-            }
-            
-            if (right.length == nextRight) {
-               while (nextLeft < left.length) {
-                    result[nextResult++] = left[nextLeft++]; 
-                }
-               break;
-            }
-            
-            if (left[nextLeft] < right[nextRight]) {
-                result[nextResult++] = left[nextLeft++];
-            } else {
-                result[nextResult++] = right[nextRight++];
-            }
+        // Copy until end of one array
+        while (j < left.length && k < right.length) {    
+            result[i++] = left[j] < right[k] 
+                ? left[j++] 
+                : right[k++];
+        } 
+
+        // Copy all remaining elements in left 
+        while (j < left.length) {
+            result[i++] = left[j++]; 
+        }
+        
+        // Copy all remaining elements in right
+        while (k < right.length) {
+            result[i++] = right[k++]; 
         }
         return result;
     }
-    
-    public static void main(String[] args) {
-        int[] a = {3,2,1,0};
-        System.out.println(Arrays.toString(a));
-        mergeSort(a);
-        System.out.println(Arrays.toString(a));
-        
-    }
+
 }
 
