@@ -1,0 +1,10 @@
+Insertion is definatley better at array sizes under 100. 
+If you have an unmutable structure then the only algorithm 
+you can use is mergesort. The more sorted the data is the 
+better insertion is. 
+
+If data is unknown (including length) mergesort is the 
+better choice, unless memory is limited. Then you should 
+use quicksort. Insertionsort should be avoided when the 
+structure is longer than 100 and you are sure its not 
+nearly sorted.
