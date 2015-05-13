@@ -1,0 +1,62 @@
+Arrays of length 10
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |       0.000030 |       0.000024 |       0.000021
+Quicksort      |       0.000087 |       0.000090 |       0.000094
+Merge sort     |       0.000269 |       0.000310 |       0.000269
+
+Arrays of length 30
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |       0.000247 |       0.000073 |       0.000052
+Quicksort      |       0.000364 |       0.000380 |       0.000408
+Merge sort     |       0.000923 |       0.000917 |       0.001051
+
+Arrays of length 100
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |       0.002375 |       0.000335 |       0.000173
+Quicksort      |       0.001640 |       0.002058 |       0.002075
+Merge sort     |       0.003397 |       0.003275 |       0.003297
+
+Arrays of length 300
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |       0.029391 |       0.002566 |       0.000493
+Quicksort      |       0.006459 |       0.011758 |       0.012654
+Merge sort     |       0.011440 |       0.013690 |       0.011148
+
+Arrays of length 1000
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |       0.335647 |       0.012599 |       0.001473
+Quicksort      |       0.039666 |       0.073596 |       0.066105
+Merge sort     |       0.078650 |       0.044403 |       0.039540
+
+Arrays of length 3000
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |       3.055101 |       0.174633 |       0.004165
+Quicksort      |       0.208356 |       0.447487 |       0.385181
+Merge sort     |       0.263321 |       0.183060 |       0.133937
+
+Arrays of length 10000
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |      32.565757 |       2.655119 |       0.013442
+Quicksort      |       0.839577 |       1.725092 |       2.251192
+Merge sort     |       0.981899 |       0.613440 |       0.526081
+
+Arrays of length 30000
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |     295.940346 |      21.932618 |       0.040044
+Quicksort      |       2.707971 |       5.346483 |      10.621350
+Merge sort     |       3.783454 |       1.664917 |       1.426960
+
+Arrays of length 100000
+=================================================================
+Algorithm      |         Random |     95% sorted |         Sorted
+Insertion sort |    3252.710219 |     217.632920 |       0.134949
+Quicksort      |      10.009693 |      23.272097 |      62.766195
+Merge sort     |      12.699759 |       6.263282 |       5.228489

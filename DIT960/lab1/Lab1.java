@@ -8,14 +8,16 @@ public class Lab1 {
      */
     public static void insertionSort(int[] array) {
         for (int i = 1; i < array.length; i++) {
-            int k = i;
-            while (k > 0 && array[k] < array[k-1]) {
-                swap(array,k,k-1);
+            int element = array[i];
+            int k = i - 1;
+            while (k >= 0 && element < array[k]) {
+                array[k+1] = array[k];
                 k--;
             }
+            array[k+1] = element;
         }
     }
-
+    
     // Quicksort.
 
     public static void quickSort(int[] array) {
@@ -26,6 +28,10 @@ public class Lab1 {
     private static void quickSort(int[] array, int begin, int end) {
         // Base case.
         if (begin >= end) return;
+        
+        // Takes the middle element as the pivot element,
+        // thus resulting in faster time on sorted arrays.
+        swap(array, begin, (begin + end) / 2);
 
         // Partition the array.
         int pivot = partition(array, begin, end);
@@ -41,9 +47,14 @@ public class Lab1 {
         // array[begin] will be the pivot element
         int low = begin+1;
         int high = end;
+        int pivot = array[begin];
+        
+        while(pivot < array[high]){
+            high--;
+        }
         
         while (low <= high) {
-            if (array[low] <= array[begin]) {
+            if (array[low] <= pivot) {
                 low++;
             } else {
                 swap(array,low,high);
