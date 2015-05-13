@@ -31,6 +31,7 @@ public class Lab1 {
         
         // Takes the middle element as the pivot element,
         // thus resulting in faster time on sorted arrays.
+        // This is also to avoid stackoverflow on the large arrays.
         swap(array, begin, (begin + end) / 2);
 
         // Partition the array.
