@@ -1,3 +1,6 @@
+
+import java.util.Objects;
+
 public class Bid {
 	final public String name;
 	final public int bid;
@@ -11,18 +14,27 @@ public class Bid {
 		return 1 + 23*bid + 31*name.hashCode();
 	}
 
-	public boolean equals(Object obj){
-		if (obj == null || !(obj instanceof Bid)) return false;
+    @Override
+    public String toString() {
+        return name + " " + bid;
+    }
 
-		Bid bid = (Bid) obj;
-
-		// TODO: compare the objects
-		throw new UnsupportedOperationException();
-	}
-	
-	public String toString(){
-		// TODO: return a description of the bid
-		throw new UnsupportedOperationException();
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || !(obj instanceof Bid)) return false;
+        
+        final Bid bid = (Bid) obj;
+        
+        if (!Objects.equals(this.name, bid.name)) {
+            return false;
+        }
+        
+        if (this.bid != bid.bid) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }
 
