@@ -48,10 +48,10 @@ public class Lab1 {
         while (low <= high) {
             if (array[low] <= pivot) {
                 low++;
-            } else if(pivot < array[high]){
-                high--;
             } else {
-                swap(array,low,high);
+                if(pivot >= array[high]){
+                    swap(array,low,high);
+                }
                 high--;
             }
         }
