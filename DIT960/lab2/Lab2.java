@@ -74,12 +74,12 @@ public class Lab2 {
 
 		sb.append("Sellers: ");
                 while(!sell_pq.isEmpty()){
-                    sb.append(sell_pq.remove() + " ");
+                    sb.append(sell_pq.remove() + ", ");
                 }
                 sb.append("\n");
 		sb.append("Buyers: ");
                 while(!buy_pq.isEmpty()){
-                    sb.append(buy_pq.remove() + " ");
+                    sb.append(buy_pq.remove() + ", ");
                 }
 
 		return sb.toString();
