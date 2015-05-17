@@ -28,11 +28,6 @@ public class Lab1 {
     private static void quickSort(int[] array, int begin, int end) {
         // Base case.
         if (begin >= end) return;
-        
-        // Takes the middle element as the pivot element,
-        // thus resulting in faster time on sorted arrays.
-        // This is also to avoid stackoverflow on the large arrays.
-        swap(array, begin, (begin + end) / 2);
 
         // Partition the array.
         int pivot = partition(array, begin, end);
@@ -50,13 +45,11 @@ public class Lab1 {
         int high = end;
         int pivot = array[begin];
         
-        while(pivot < array[high]){
-            high--;
-        }
-        
         while (low <= high) {
             if (array[low] <= pivot) {
                 low++;
+            } else if(pivot < array[high]){
+                high--;
             } else {
                 swap(array,low,high);
                 high--;
