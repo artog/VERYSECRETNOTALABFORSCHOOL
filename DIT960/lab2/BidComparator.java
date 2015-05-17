@@ -3,6 +3,9 @@ import java.util.Comparator;
 
 class BidComparator implements Comparator<Bid> {
 
+    public static final boolean MAX = true;
+    public static final boolean MIN = false;
+    
     private int mod = 1;
 
     public BidComparator(boolean isMax) {

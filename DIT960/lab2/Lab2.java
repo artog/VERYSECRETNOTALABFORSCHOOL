@@ -4,7 +4,8 @@ import java.util.*;
 
 public class Lab2 {
 	public static String pureMain(String[] commands) {
-		// TODO: declaration of two priority queues
+                PriorityQueue<Bid> buy_pq = new PriorityQueue(new BidComparator(BidComparator.MAX));
+                PriorityQueue<Bid> sell_pq = new PriorityQueue(new BidComparator(BidComparator.MIN));
 
 		StringBuilder sb = new StringBuilder();
 
@@ -26,15 +27,33 @@ public class Lab2 {
 				throw new RuntimeException(
 						"line " + line_no + ": invalid price");
 			}
-
+                        
+                        int newPrice = 0;
+                        if(parts.length == 4){
+                            try {
+				newPrice = Integer.parseInt(parts[3]);
+                            } catch(NumberFormatException e){
+				throw new RuntimeException(
+						"line " + line_no + ": invalid new price");
+                            }
+                        }
+                        
 			if( action.equals("K") ) {
-				// TODO: add new buy bid
+                            buy_pq.add(new Bid(name, price));
 			} else if( action.equals("S") ) {
-				// TODO: add new sell bid
+                            sell_pq.add(new Bid(name, price));
 			} else if( action.equals("NK") ){
-				// TODO: update existing buy bid. use parts[3].
+                            // TODO: I think this is wrong implementation.
+                            // OLD_TODO: update existing buy bid. use parts[3].
+                            buy_pq.remove(new Bid(name, price));
+                            buy_pq.add(new Bid(name, newPrice));
+                                
 			} else if( action.equals("NS") ){
-				// TODO: update existing sell bid. use parts[3].
+                            // TODO: I think this is wrong implementation.
+                            // OLD_TODO: update existing sell bid. use parts[3].
+                            sell_pq.remove(new Bid(name, price));
+                            sell_pq.add(new Bid(name, newPrice));
+                                
 			} else {
 				throw new RuntimeException(
 						"line " + line_no + ": invalid action");
@@ -54,12 +73,14 @@ public class Lab2 {
 		sb.append("Order book:\n");
 
 		sb.append("Sellers: ");
-		// TODO: print remaining sellers.
-		//       can remove from priority queue until it is empty.
-
+                while(!sell_pq.isEmpty()){
+                    sb.append(sell_pq.remove() + " ");
+                }
+                sb.append("\n");
 		sb.append("Buyers: ");
-		// TODO: print remaining buyers
-		//       can remove from priority queue until it is empty.
+                while(!buy_pq.isEmpty()){
+                    sb.append(buy_pq.remove() + " ");
+                }
 
 		return sb.toString();
 	}
