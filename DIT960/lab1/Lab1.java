@@ -51,6 +51,7 @@ public class Lab1 {
             } else {
                 if(pivot >= array[high]){
                     swap(array,low,high);
+                    low++;
                 }
                 high--;
             }
