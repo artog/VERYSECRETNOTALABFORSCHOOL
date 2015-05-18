@@ -122,10 +122,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
                     throw new NoSuchElementException( );
             }
             
-            public void remove( )
-            {
-                throw new UnsupportedOperationException( );
-            }
+            public void remove( ) { }
         };
     }
      
@@ -191,12 +188,33 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
             if( child != currentSize &&
                     compare( array[ child + 1 ], array[ child ] ) < 0 )
                 child++;
-            if( compare( array[ child ], tmp ) < 0 )
+            if( compare( array[ child ], tmp ) < 0 ) {
                 array[ hole ] = array[ child ];
-            else
+            } else {
                 break;
+            }
         }
         array[ hole ] = tmp;
+    }
+    /**
+     * Internal method to percolate up in the heap.
+     * @param hole the index at which the percolate begins.
+     */
+    private void percolateUp( int hole )
+    {
+        int child;
+        AnyType tmp = array[ hole ];
+        
+        for( ; hole > 1 ; hole /= 2 ) {
+            
+            if (compare( tmp, array[ hole / 2 ] ) < 0) {
+                array[ hole ] = array[ hole / 2 ];
+            } else {
+                break;
+            }
+        }
+        array[ hole ] = tmp;
+        
     }
     
     /**
@@ -213,8 +231,8 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     }
     
     private int lookup(AnyType x) {
-        int i = 0;
-        while (i < currentSize) {
+        int i = 1;
+        while (i <= currentSize) {
             if (compare(array[i], x) == 0) {
                 return i;
             } else if (compare(array[i], x) < 0) {
@@ -234,8 +252,31 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         }
         
         array[index] = notOld;
+        
+        if (compare(old, notOld) < 0) {
+            percolateDown(index);
+        } else {
+            percolateUp(index);
+        }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (AnyType e : array) {
+            if (e != null) {
+                sb.append(e.toString()+", ");
+            } else {
+                sb.append("-,");
+            }
+        }
+        sb.setCharAt(sb.length()-1, ']');
+        return sb.toString();
+    }
+
+    
+    
     @Override
     public boolean offer(AnyType e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -249,5 +290,9 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     @Override
     public AnyType peek() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void printDebug(String source) {
+        System.err.println(source+": "+toString());
     }
 }

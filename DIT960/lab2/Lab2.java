@@ -45,14 +45,14 @@ public class Lab2 {
 			} else if( action.equals("NK") ){
                             // TODO: I think this is wrong implementation.
                             // OLD_TODO: update existing buy bid. use parts[3].
-                            buy_pq.remove(new Bid(name, price));
-                            buy_pq.add(new Bid(name, newPrice));
+                            buy_pq.update(  new Bid(name, price),
+                                            new Bid(name, newPrice));
                                 
 			} else if( action.equals("NS") ){
                             // TODO: I think this is wrong implementation.
                             // OLD_TODO: update existing sell bid. use parts[3].
-                            sell_pq.remove(new Bid(name, price));
-                            sell_pq.add(new Bid(name, newPrice));
+                            sell_pq.update( new Bid(name, price),
+                                            new Bid(name, newPrice));
                                 
 			} else {
 				throw new RuntimeException(
