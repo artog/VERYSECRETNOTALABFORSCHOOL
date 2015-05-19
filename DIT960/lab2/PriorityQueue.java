@@ -2,7 +2,9 @@
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
@@ -11,9 +13,17 @@ import java.util.Queue;
  * PriorityQueue class implemented via the binary heap.
  * @param <AnyType>
  */
-public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
-                                    implements Queue<AnyType>
+public class PriorityQueue<AnyType> 
 {
+    
+    private static final int DEFAULT_CAPACITY = 100;
+
+    private int currentSize;   // Number of elements in heap
+    private AnyType[ ] array; // The heap array
+    private final Comparator<? super AnyType> cmp;
+    
+    private final Map<AnyType,Integer> indexMap = new HashMap<>();
+    
     /**
      * Construct an empty PriorityQueue.
      */
@@ -73,9 +83,10 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * @param x any object.
      * @return true.
      */
-    @Override
     public boolean add( AnyType x )
     {
+        assert invariant() : showHeap();
+        
         if( currentSize + 1 == array.length )
             doubleArray( );
 
@@ -83,10 +94,16 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         int hole = ++currentSize;
         array[ 0 ] = x;
         
-        for( ; compare( x, array[ hole / 2 ] ) < 0; hole /= 2 )
-            array[ hole ] = array[ hole / 2 ];
-        array[ hole ] = x;
+        for( ; compare( x, array[ hole / 2 ] ) < 0; hole /= 2 ) {
+            array[ hole ] = array[ hole / 2 ]; 
+            indexMap.put(array[ hole ], hole);
+        }
         
+        array[ hole ] = x;
+        indexMap.put(array[ hole ], hole);
+        
+        
+        assert invariant() : showHeap();
         return true;
     }
     
@@ -94,7 +111,6 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * Returns the number of items in this PriorityQueue.
      * @return the number of items in this PriorityQueue.
      */
-    @Override
     public int size( )
     {
         return currentSize;
@@ -103,49 +119,17 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     /**
      * Make this PriorityQueue empty.
      */
-    @Override
     public void clear( )
     {
         currentSize = 0;
     }
     
-    /**
-     * Returns an iterator over the elements in this PriorityQueue.
-     * The iterator does not view the elements in any particular order.
-     */
-    @Override
-    public Iterator<AnyType> iterator( )
-    {
-        return new Iterator<AnyType>( )
-        {
-            int current = 0;
-            
-            @Override
-            public boolean hasNext( )
-            {
-                return current != size( );
-            }
-            
-            @Override
-            public AnyType next( )
-            {
-                if( hasNext( ) )
-                    return array[ ++current ];
-                else
-                    throw new NoSuchElementException( );
-            }
-            
-            @Override
-            public void remove( ) { }
-        };
-    }
      
     /**
      * Returns the smallest item in the priority queue.
      * @return the smallest item.
      * @throws NoSuchElementException if empty.
      */
-    @Override
     public AnyType element( )
     {
         if( isEmpty( ) )
@@ -153,17 +137,16 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         return array[ 1 ];
     }
     
-    @Override
-    public AnyType peek() {
-        return element();
+    public boolean isEmpty() {
+        return currentSize == 0;
     }
+    
     
     /**
      * Removes the smallest item in the priority queue.
      * @return the smallest item.
      * @throws NoSuchElementException if empty.
      */
-    @Override
     public AnyType remove( )
     {
         AnyType minItem = element( );
@@ -184,11 +167,6 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
             percolateDown( i );
     }
 
-    private static final int DEFAULT_CAPACITY = 100;
-
-    private int currentSize;   // Number of elements in heap
-    private AnyType [ ] array; // The heap array
-    private final Comparator<? super AnyType> cmp;
 
     /**
      * Internal method to percolate down in the heap.
@@ -207,11 +185,14 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
                 child++;
             if( compare( array[ child ], tmp ) < 0 ) {
                 array[ hole ] = array[ child ];
+                indexMap.put(array[ hole ], hole);
+                
             } else {
                 break;
             }
         }
         array[ hole ] = tmp;
+        indexMap.put(array[ hole ], hole);
     }
     /**
      * Internal method to percolate up in the heap.
@@ -226,11 +207,13 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
             
             if (compare( tmp, array[ hole / 2 ] ) < 0) {
                 array[ hole ] = array[ hole / 2 ];
+                indexMap.put(array[ hole ], hole);
             } else {
                 break;
             }
         }
         array[ hole ] = tmp;
+        indexMap.put(array[ hole ], hole);
         
     }
     
@@ -248,21 +231,12 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     }
     
     private int lookup(AnyType x) {
-        int i = 1;
-        while (i <= currentSize) {
-            if (compare(array[i], x) == 0) {
-                return i;
-            } else if (compare(array[i], x) < 0) {
-                i = i*2;
-            } else {
-                i = i*2+1;
-            }
-        }
-        return currentSize+1;
+        return indexMap.get(x);
     }
     
     public void update(AnyType old, AnyType notOld) {
-        printDebug("update");
+        assert invariant() : showHeap();
+        
         int index = lookup(old);
         
         if ( index == array.length ) {
@@ -270,13 +244,16 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         }
         
         array[index] = notOld;
+        indexMap.put(notOld, index);
+        indexMap.remove(old);
         
         if (compare(old, notOld) < 0) {
             percolateDown(index);
         } else {
             percolateUp(index);
         }
-        printDebug("update");
+        
+        assert invariant() : showHeap();
     }
 
     @Override
@@ -296,18 +273,62 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     }
 
     
-    
-    @Override
-    public boolean offer(AnyType e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private boolean invariant() {
+        boolean gotNull = false;
+        
+        // Check completeness
+        for (AnyType e : array) {
+            if (e == null) {
+                gotNull = true;
+            } else {
+                if (gotNull) {
+                    return false;
+                }
+            }
+        }
+        
+        // Check heap invariant
+        for (int i = 1; i < currentSize; i++) {
+            AnyType e = array[i];
+            if (e == null) {
+                break;
+            }
+            
+            int rChild = 2*i+1;
+            int lChild = 2*i;
+            
+            if (lChild > currentSize) {
+                break;
+            }
+            
+            if (compare(array[lChild],e) <= 0) {
+                return false;
+            }
+            
+            if (rChild > currentSize) {
+                break;
+            }
+            
+            if (compare(array[rChild],e) <= 0) {
+                return false;
+            }
+            
+            
+        }
+        
+        // Check indexMap invariant
+        for (int i = 1; i <= currentSize; i++) {
+            Integer j = indexMap.get(array[i]);
+            if (j == null || j != i) {
+                return false;
+            }
+        }
+        
+        
+        return true;
     }
 
-    @Override
-    public AnyType poll() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void printDebug(String source) {
-        System.err.println(source+": "+toString());
+    private String showHeap(){
+        return toString();
     }
 }

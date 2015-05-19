@@ -56,14 +56,8 @@ public class Lab2 {
 			if( sell_pq.size() == 0 || buy_pq.size() == 0 )continue;
 			
 
-			// TODO:
-			// compare the bids of highest priority from each of
-			// each priority queues.
-			// if the lowest seller price is lower than or equal to
-			// the highest buyer price, then remove one bid from
-			// each priority queue and add a description of the
-			// transaction to the output.
-            if(sell_pq.peek().bid <= buy_pq.peek().bid){
+			
+            if (sell_pq.element().bid <= buy_pq.element().bid) {
                 Bid seller = sell_pq.remove();
                 Bid buyer = buy_pq.remove();
 
