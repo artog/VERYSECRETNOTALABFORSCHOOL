@@ -1,12 +1,11 @@
 
-import java.util.AbstractCollection;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Queue;
 
 
 /**
@@ -18,64 +17,32 @@ public class PriorityQueue<AnyType>
     
     private static final int DEFAULT_CAPACITY = 100;
 
-    private int currentSize;   // Number of elements in heap
-    private AnyType[ ] array; // The heap array
+    private List<AnyType> list; // The heap array
     private final Comparator<? super AnyType> cmp;
     
     private final Map<AnyType,Integer> indexMap = new HashMap<>();
     
-    /**
-     * Construct an empty PriorityQueue.
-     */
-    @SuppressWarnings("unchecked")
-    public PriorityQueue( )
-    {
-        currentSize = 0;
-        cmp = null;
-        array = (AnyType[]) new Object[ DEFAULT_CAPACITY + 1 ];
-    }
     
     /**
      * Construct an empty PriorityQueue with a specified comparator.
      * @param c
      */
-    @SuppressWarnings("unchecked")
     public PriorityQueue( Comparator<? super AnyType> c )
     {
-        currentSize = 0;
+        if (c == null) {
+            throw new IllegalArgumentException("Comparator is null.");
+        }
         cmp = c;
-        array = (AnyType[]) new Object[ DEFAULT_CAPACITY + 1 ];
-    }
-    
-     
-    /**
-     * Construct a PriorityQueue from another Collection.
-     * @param coll
-     */
-    @SuppressWarnings("unchecked")
-    public PriorityQueue( Collection<? extends AnyType> coll )
-    {
-        cmp = null;
-        currentSize = coll.size( );
-        array = (AnyType[]) new Object[ ( currentSize + 2 ) * 11 / 10 ];
-        
-        int i = 1;
-        for( AnyType item : coll )
-            array[ i++ ] = item;
-        buildHeap( );
+        list = new ArrayList<>();
     }
     
     /**
      * Compares lhs and rhs using comparator if
      * provided by cmp, or the default comparator.
      */
-    @SuppressWarnings("unchecked")
     private int compare( AnyType lhs, AnyType rhs )
     {
-        if( cmp == null )
-            return ((Comparable)lhs).compareTo( rhs );
-        else
-            return cmp.compare( lhs, rhs );    
+        return cmp.compare( lhs, rhs );    
     }
     
     /**
@@ -87,20 +54,24 @@ public class PriorityQueue<AnyType>
     {
         assert invariant() : showHeap();
         
-        if( currentSize + 1 == array.length )
-            doubleArray( );
 
-            // Percolate up
-        int hole = ++currentSize;
-        array[ 0 ] = x;
+        // Percolate up
+        int hole = list.size();
+        list.add(x);
         
-        for( ; compare( x, array[ hole / 2 ] ) < 0; hole /= 2 ) {
-            array[ hole ] = array[ hole / 2 ]; 
-            indexMap.put(array[ hole ], hole);
-        }
+        percolateUp(hole);
         
-        array[ hole ] = x;
-        indexMap.put(array[ hole ], hole);
+//        for( ; compare( x, list.get(hole / 2)) < 0; hole /= 2 ) {
+//            list.set( 
+//                hole, 
+//                list.get( hole / 2 )
+//            ); 
+//            
+//            indexMap.put(list.get( hole ), hole);
+//        }
+//        
+//        list.set(hole, x);
+//        indexMap.put(list.get( hole ), hole);
         
         
         assert invariant() : showHeap();
@@ -113,7 +84,7 @@ public class PriorityQueue<AnyType>
      */
     public int size( )
     {
-        return currentSize;
+        return list.size();
     }
     
     /**
@@ -121,7 +92,7 @@ public class PriorityQueue<AnyType>
      */
     public void clear( )
     {
-        currentSize = 0;
+        list.clear();
     }
     
      
@@ -132,13 +103,14 @@ public class PriorityQueue<AnyType>
      */
     public AnyType element( )
     {
-        if( isEmpty( ) )
-            throw new NoSuchElementException( );
-        return array[ 1 ];
+        if(isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return list.get(0);
     }
     
     public boolean isEmpty() {
-        return currentSize == 0;
+        return list.isEmpty();
     }
     
     
@@ -149,9 +121,17 @@ public class PriorityQueue<AnyType>
      */
     public AnyType remove( )
     {
-        AnyType minItem = element( );
-        array[ 1 ] = array[ currentSize-- ];
-        percolateDown( 1 );
+        AnyType minItem = element();
+        
+        list.set(
+            0, 
+            list.get(
+                list.size()-1
+            )
+        );
+        percolateDown(0);
+        
+        list.remove(list.size()-1);
 
         return minItem;
     }
@@ -163,8 +143,9 @@ public class PriorityQueue<AnyType>
      */
     private void buildHeap( )
     {
-        for( int i = currentSize / 2; i > 0; i-- )
-            percolateDown( i );
+        for( int i = (list.size() - 1) / 2; i >= 0; i--) {
+            percolateDown(i);
+        }
     }
 
 
@@ -175,24 +156,24 @@ public class PriorityQueue<AnyType>
     private void percolateDown( int hole )
     {
         int child;
-        AnyType tmp = array[ hole ];
-
-        for( ; hole * 2 <= currentSize; hole = child )
+        AnyType tmp = list.get(hole);
+        
+        for( ; hole * 2 < list.size()-1; hole = child )
         {
-            child = hole * 2;
-            if( child != currentSize &&
-                    compare( array[ child + 1 ], array[ child ] ) < 0 )
+            child = hole * 2 + 1;
+            if( child != list.size()-1 &&
+                    compare( list.get( child + 1 ), list.get( child ) ) < 0 )
                 child++;
-            if( compare( array[ child ], tmp ) < 0 ) {
-                array[ hole ] = array[ child ];
-                indexMap.put(array[ hole ], hole);
+            if( compare( list.get( child ), tmp ) < 0 ) {
+                list.set( hole ,list.get( child ));
+                indexMap.put(list.get( hole ), hole);
                 
             } else {
                 break;
             }
         }
-        array[ hole ] = tmp;
-        indexMap.put(array[ hole ], hole);
+        list.set( hole ,tmp);
+        indexMap.put(list.get( hole ), hole);
     }
     /**
      * Internal method to percolate up in the heap.
@@ -201,34 +182,26 @@ public class PriorityQueue<AnyType>
     private void percolateUp( int hole )
     {
         int child;
-        AnyType tmp = array[ hole ];
+        AnyType tmp = list.get(hole);
         
-        for( ; hole > 1 ; hole /= 2 ) {
+        while (hole > 0) {
             
-            if (compare( tmp, array[ hole / 2 ] ) < 0) {
-                array[ hole ] = array[ hole / 2 ];
-                indexMap.put(array[ hole ], hole);
+            if (compare( tmp, list.get( hole / 2 ) ) < 0) {
+                list.set( hole , list.get( hole / 2 ));
+                indexMap.put(list.get( hole ), hole);
             } else {
                 break;
             }
+            
+            hole /= 2;
+            
         }
-        array[ hole ] = tmp;
-        indexMap.put(array[ hole ], hole);
+        list.set( hole ,tmp);
+        indexMap.put(list.get( hole ), hole);
         
     }
     
-    /**
-     * Internal method to extend array.
-     */
-    @SuppressWarnings("unchecked")
-    private void doubleArray( )
-    {
-        AnyType [ ] newArray;
-
-        newArray = (AnyType []) new Object[ array.length * 2 ];
-        System.arraycopy(array, 0, newArray, 0, array.length);
-        array = newArray;
-    }
+   
     
     private int lookup(AnyType x) {
         return indexMap.get(x);
@@ -239,11 +212,8 @@ public class PriorityQueue<AnyType>
         
         int index = lookup(old);
         
-        if ( index == array.length ) {
-            doubleArray();
-        }
         
-        array[index] = notOld;
+        list.set(index , notOld);
         indexMap.put(notOld, index);
         indexMap.remove(old);
         
@@ -260,7 +230,7 @@ public class PriorityQueue<AnyType>
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        for (AnyType e : array) {
+        for (AnyType e : list) {
             if (e != null) {
                 sb.append(e.toString())
                   .append(", ");
@@ -277,7 +247,7 @@ public class PriorityQueue<AnyType>
         boolean gotNull = false;
         
         // Check completeness
-        for (AnyType e : array) {
+        for (AnyType e : list) {
             if (e == null) {
                 gotNull = true;
             } else {
@@ -288,28 +258,30 @@ public class PriorityQueue<AnyType>
         }
         
         // Check heap invariant
-        for (int i = 1; i < currentSize; i++) {
-            AnyType e = array[i];
+        for (int i = 0; i < list.size()-1; i++) {
+            AnyType e = list.get(i);
             if (e == null) {
                 break;
             }
             
-            int rChild = 2*i+1;
-            int lChild = 2*i;
+            int rChild = 2*i+2;
+            int lChild = 2*i+1;
             
-            if (lChild > currentSize) {
+            if (lChild > list.size()-1) {
                 break;
             }
             
-            if (compare(array[lChild],e) <= 0) {
+            if (compare(list.get(lChild),e) < 0) {
+                System.err.println("l:"+lChild + " vs "+ i + " == " +compare(list.get(lChild),e));
                 return false;
             }
             
-            if (rChild > currentSize) {
+            if (rChild > list.size()-1) {
                 break;
             }
             
-            if (compare(array[rChild],e) <= 0) {
+            if (compare(list.get(rChild),e) < 0) {
+                System.err.println("r: "+rChild + " vs "+ i + " == " +compare(list.get(rChild),e));
                 return false;
             }
             
@@ -317,9 +289,10 @@ public class PriorityQueue<AnyType>
         }
         
         // Check indexMap invariant
-        for (int i = 1; i <= currentSize; i++) {
-            Integer j = indexMap.get(array[i]);
+        for (int i = 0; i < list.size(); i++) {
+            Integer j = indexMap.get(list.get(i));
             if (j == null || j != i) {
+                System.err.println("indexMap fail at "+i);
                 return false;
             }
         }
