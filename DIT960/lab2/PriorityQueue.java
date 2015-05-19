@@ -9,6 +9,7 @@ import java.util.Queue;
 
 /**
  * PriorityQueue class implemented via the binary heap.
+ * @param <AnyType>
  */
 public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
                                     implements Queue<AnyType>
@@ -16,6 +17,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     /**
      * Construct an empty PriorityQueue.
      */
+    @SuppressWarnings("unchecked")
     public PriorityQueue( )
     {
         currentSize = 0;
@@ -25,7 +27,9 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     
     /**
      * Construct an empty PriorityQueue with a specified comparator.
+     * @param c
      */
+    @SuppressWarnings("unchecked")
     public PriorityQueue( Comparator<? super AnyType> c )
     {
         currentSize = 0;
@@ -36,7 +40,9 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      
     /**
      * Construct a PriorityQueue from another Collection.
+     * @param coll
      */
+    @SuppressWarnings("unchecked")
     public PriorityQueue( Collection<? extends AnyType> coll )
     {
         cmp = null;
@@ -53,6 +59,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * Compares lhs and rhs using comparator if
      * provided by cmp, or the default comparator.
      */
+    @SuppressWarnings("unchecked")
     private int compare( AnyType lhs, AnyType rhs )
     {
         if( cmp == null )
@@ -66,6 +73,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * @param x any object.
      * @return true.
      */
+    @Override
     public boolean add( AnyType x )
     {
         if( currentSize + 1 == array.length )
@@ -86,6 +94,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * Returns the number of items in this PriorityQueue.
      * @return the number of items in this PriorityQueue.
      */
+    @Override
     public int size( )
     {
         return currentSize;
@@ -94,6 +103,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     /**
      * Make this PriorityQueue empty.
      */
+    @Override
     public void clear( )
     {
         currentSize = 0;
@@ -103,17 +113,20 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * Returns an iterator over the elements in this PriorityQueue.
      * The iterator does not view the elements in any particular order.
      */
+    @Override
     public Iterator<AnyType> iterator( )
     {
         return new Iterator<AnyType>( )
         {
             int current = 0;
             
+            @Override
             public boolean hasNext( )
             {
                 return current != size( );
             }
             
+            @Override
             public AnyType next( )
             {
                 if( hasNext( ) )
@@ -122,6 +135,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
                     throw new NoSuchElementException( );
             }
             
+            @Override
             public void remove( ) { }
         };
     }
@@ -131,6 +145,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * @return the smallest item.
      * @throws NoSuchElementException if empty.
      */
+    @Override
     public AnyType element( )
     {
         if( isEmpty( ) )
@@ -138,7 +153,8 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         return array[ 1 ];
     }
     
-    public AnyType peed() {
+    @Override
+    public AnyType peek() {
         return element();
     }
     
@@ -147,6 +163,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
      * @return the smallest item.
      * @throws NoSuchElementException if empty.
      */
+    @Override
     public AnyType remove( )
     {
         AnyType minItem = element( );
@@ -171,7 +188,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
 
     private int currentSize;   // Number of elements in heap
     private AnyType [ ] array; // The heap array
-    private Comparator<? super AnyType> cmp;
+    private final Comparator<? super AnyType> cmp;
 
     /**
      * Internal method to percolate down in the heap.
@@ -220,13 +237,13 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     /**
      * Internal method to extend array.
      */
+    @SuppressWarnings("unchecked")
     private void doubleArray( )
     {
         AnyType [ ] newArray;
 
         newArray = (AnyType []) new Object[ array.length * 2 ];
-        for( int i = 0; i < array.length; i++ )
-            newArray[ i ] = array[ i ];
+        System.arraycopy(array, 0, newArray, 0, array.length);
         array = newArray;
     }
     
@@ -245,6 +262,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
     }
     
     public void update(AnyType old, AnyType notOld) {
+        printDebug("update");
         int index = lookup(old);
         
         if ( index == array.length ) {
@@ -258,6 +276,7 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         } else {
             percolateUp(index);
         }
+        printDebug("update");
     }
 
     @Override
@@ -266,7 +285,8 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
         sb.append("[");
         for (AnyType e : array) {
             if (e != null) {
-                sb.append(e.toString()+", ");
+                sb.append(e.toString())
+                  .append(", ");
             } else {
                 sb.append("-,");
             }
@@ -284,11 +304,6 @@ public class PriorityQueue<AnyType> extends AbstractCollection<AnyType>
 
     @Override
     public AnyType poll() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public AnyType peek() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

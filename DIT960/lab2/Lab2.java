@@ -4,8 +4,8 @@ import java.util.*;
 
 public class Lab2 {
 	public static String pureMain(String[] commands) {
-                PriorityQueue<Bid> buy_pq = new PriorityQueue(new BidComparator(BidComparator.MAX));
-                PriorityQueue<Bid> sell_pq = new PriorityQueue(new BidComparator(BidComparator.MIN));
+                PriorityQueue<Bid> buy_pq = new PriorityQueue<Bid>(new BidComparator(BidComparator.MAX));
+                PriorityQueue<Bid> sell_pq = new PriorityQueue<Bid>(new BidComparator(BidComparator.MIN));
 
 		StringBuilder sb = new StringBuilder();
 
@@ -63,11 +63,16 @@ public class Lab2 {
 			// the highest buyer price, then remove one bid from
 			// each priority queue and add a description of the
 			// transaction to the output.
-                        if(sell_pq.peek().bid <= buy_pq.peek().bid){
-                            Bid seller = sell_pq.remove();
-                            Bid buyer = buy_pq.remove();
-                            sb.append(buyer.name + " buys a share from " + seller.name + "for " + buyer.bid + "kr");
-                        }
+            if(sell_pq.peek().bid <= buy_pq.peek().bid){
+                Bid seller = sell_pq.remove();
+                Bid buyer = buy_pq.remove();
+
+                String format = "%s buys a share from %s for %d kr%n";
+
+                sb.append(
+                    String.format(format, buyer.name, seller.name, buyer.bid)
+                );
+            }
 		}
 
 		sb.append("Order book:\n");
