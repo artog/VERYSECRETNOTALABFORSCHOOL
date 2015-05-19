@@ -43,17 +43,11 @@ public class Lab2 {
 			} else if( action.equals("S") ) {
                             sell_pq.add(new Bid(name, price));
 			} else if( action.equals("NK") ){
-                            // TODO: I think this is wrong implementation.
-                            // OLD_TODO: update existing buy bid. use parts[3].
                             buy_pq.update(  new Bid(name, price),
                                             new Bid(name, newPrice));
-                                
 			} else if( action.equals("NS") ){
-                            // TODO: I think this is wrong implementation.
-                            // OLD_TODO: update existing sell bid. use parts[3].
                             sell_pq.update( new Bid(name, price),
-                                            new Bid(name, newPrice));
-                                
+                                            new Bid(name, newPrice)); 
 			} else {
 				throw new RuntimeException(
 						"line " + line_no + ": invalid action");
@@ -61,6 +55,7 @@ public class Lab2 {
 
 			if( sell_pq.size() == 0 || buy_pq.size() == 0 )continue;
 			
+
 			// TODO:
 			// compare the bids of highest priority from each of
 			// each priority queues.
@@ -68,18 +63,25 @@ public class Lab2 {
 			// the highest buyer price, then remove one bid from
 			// each priority queue and add a description of the
 			// transaction to the output.
+                        if(sell_pq.peek().bid <= buy_pq.peek().bid){
+                            Bid seller = sell_pq.remove();
+                            Bid buyer = buy_pq.remove();
+                            sb.append(buyer.name + " buys a share from " + seller.name + "for " + buyer.bid + "kr");
+                        }
 		}
 
 		sb.append("Order book:\n");
 
 		sb.append("Sellers: ");
                 while(!sell_pq.isEmpty()){
-                    sb.append(sell_pq.remove() + ", ");
+                    sb.append(sell_pq.remove());
+                    sb.append(", ");
                 }
                 sb.append("\n");
 		sb.append("Buyers: ");
                 while(!buy_pq.isEmpty()){
-                    sb.append(buy_pq.remove() + ", ");
+                    sb.append(buy_pq.remove());
+                    sb.append(", ");
                 }
 
 		return sb.toString();
