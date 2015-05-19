@@ -58,21 +58,10 @@ public class PriorityQueue<AnyType>
         // Percolate up
         int hole = list.size();
         list.add(x);
+        System.err.printf("Adding %s at %d%n",x,hole);
         
+        System.err.println("Percolate up");
         percolateUp(hole);
-        
-//        for( ; compare( x, list.get(hole / 2)) < 0; hole /= 2 ) {
-//            list.set( 
-//                hole, 
-//                list.get( hole / 2 )
-//            ); 
-//            
-//            indexMap.put(list.get( hole ), hole);
-//        }
-//        
-//        list.set(hole, x);
-//        indexMap.put(list.get( hole ), hole);
-        
         
         assert invariant() : showHeap();
         return true;
@@ -121,6 +110,8 @@ public class PriorityQueue<AnyType>
      */
     public AnyType remove( )
     {
+        assert invariant() : showHeap();
+        
         AnyType minItem = element();
         
         list.set(
@@ -133,6 +124,7 @@ public class PriorityQueue<AnyType>
         
         list.remove(list.size()-1);
 
+        assert invariant() : showHeap();
         return minItem;
     }
 
@@ -155,24 +147,36 @@ public class PriorityQueue<AnyType>
      */
     private void percolateDown( int hole )
     {
+        System.err.println(toString());
         int child;
         AnyType tmp = list.get(hole);
         
+        System.err.printf(
+                "Percolate down: Start at %d checking %d and %d with size %d%n",
+                hole,hole*2+1,hole*2+2,list.size()
+        );
         for( ; hole * 2 < list.size()-1; hole = child )
         {
+            System.err.println("Percolate down: Check "+hole);
             child = hole * 2 + 1;
-            if( child != list.size()-1 &&
-                    compare( list.get( child + 1 ), list.get( child ) ) < 0 )
+            // Swap with right or left?
+            if (child != list.size()-1 
+                    &&
+                compare(list.get(child+1), list.get(child)) < 0 
+            ) {
                 child++;
-            if( compare( list.get( child ), tmp ) < 0 ) {
-                list.set( hole ,list.get( child ));
-                indexMap.put(list.get( hole ), hole);
+            }
+            System.err.printf("sift %d and %d%n",child,hole);
+            if (compare(list.get(child), tmp) < 0) {
+                
+                list.set(hole ,list.get(child));
+                indexMap.put(list.get(hole),hole);
                 
             } else {
                 break;
             }
         }
-        list.set( hole ,tmp);
+        list.set(hole, tmp);
         indexMap.put(list.get( hole ), hole);
     }
     /**
@@ -184,16 +188,23 @@ public class PriorityQueue<AnyType>
         int child;
         AnyType tmp = list.get(hole);
         
+        System.err.printf("Starting perc up at %d with parent %d%n",hole,(hole-1)/2);
+        System.err.println((1-1)/2);
+        System.err.println((2-1)/2);
         while (hole > 0) {
             
-            if (compare( tmp, list.get( hole / 2 ) ) < 0) {
-                list.set( hole , list.get( hole / 2 ));
-                indexMap.put(list.get( hole ), hole);
+            int parent = (hole-1)/2;
+            
+            if (compare(tmp, list.get(parent) ) < 0) {
+                
+                list.set(hole, list.get(parent));
+                indexMap.put(list.get(hole), hole);
+            
             } else {
                 break;
             }
             
-            hole /= 2;
+            hole = parent;
             
         }
         list.set( hole ,tmp);
@@ -212,14 +223,18 @@ public class PriorityQueue<AnyType>
         
         int index = lookup(old);
         
+        System.err.printf("Updating %s -> %s at %d%n",old,notOld,index);
+        
         
         list.set(index , notOld);
         indexMap.put(notOld, index);
         indexMap.remove(old);
         
         if (compare(old, notOld) < 0) {
+            System.err.println("Percolate down");
             percolateDown(index);
         } else {
+            System.err.println("Percolate up");
             percolateUp(index);
         }
         
@@ -233,7 +248,7 @@ public class PriorityQueue<AnyType>
         for (AnyType e : list) {
             if (e != null) {
                 sb.append(e.toString())
-                  .append(", ");
+                  .append(",");
             } else {
                 sb.append("-,");
             }
