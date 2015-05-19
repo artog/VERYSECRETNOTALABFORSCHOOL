@@ -8,6 +8,10 @@ class BidComparator implements Comparator<Bid> {
     
     private int mod = 1;
 
+    /**
+     * 
+     * @param isMax Used to denote if its a max r min heap.
+     */
     public BidComparator(boolean isMax) {
         
         mod = isMax ? 1 : -1; 

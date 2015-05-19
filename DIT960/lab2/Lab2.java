@@ -4,8 +4,11 @@ import java.util.*;
 
 public class Lab2 {
 	public static String pureMain(String[] commands) {
-                PriorityQueue<Bid> buy_pq = new PriorityQueue<Bid>(new BidComparator(BidComparator.MAX));
-                PriorityQueue<Bid> sell_pq = new PriorityQueue<Bid>(new BidComparator(BidComparator.MIN));
+        PriorityQueue buy_pq = new PriorityQueue(
+                new BidComparator(BidComparator.MAX));
+
+        PriorityQueue sell_pq = new PriorityQueue(
+                new BidComparator(BidComparator.MIN));
 
 		StringBuilder sb = new StringBuilder();
 

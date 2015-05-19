@@ -11,86 +11,77 @@ import java.util.Queue;
 
 /**
  * PriorityQueue class implemented via the binary heap.
- * @param <AnyType>
  */
-public class PriorityQueue<AnyType> 
+public class PriorityQueue 
 {
-    
+    /**
+     * Initial capacity of the underlying array.
+     */
     private static final int DEFAULT_CAPACITY = 100;
-
-    private int currentSize;   // Number of elements in heap
-    private AnyType[ ] array; // The heap array
-    private final Comparator<? super AnyType> cmp;
-    
-    private final Map<AnyType,Integer> indexMap = new HashMap<>();
     
     /**
-     * Construct an empty PriorityQueue.
+     * Number of elements currently in the heap.
      */
-    @SuppressWarnings("unchecked")
-    public PriorityQueue( )
-    {
-        currentSize = 0;
-        cmp = null;
-        array = (AnyType[]) new Object[ DEFAULT_CAPACITY + 1 ];
-    }
+    private int currentSize;
+    
+    /**
+     * The underlying array holding the heap.
+     */
+    private Bid[ ] array; 
+    
+    /**
+     * The comparator used for the heap invariant.
+     */
+    private final Comparator<? super Bid> cmp;
+    
+    /**
+     * A map holding each elements index, to get a O(1) lookup.
+     */
+    private final Map<Bid,Integer> indexMap = new HashMap<>();
+    
+ 
     
     /**
      * Construct an empty PriorityQueue with a specified comparator.
-     * @param c
+     * @param c Comparator to compare bids
      */
-    @SuppressWarnings("unchecked")
-    public PriorityQueue( Comparator<? super AnyType> c )
+    
+    public PriorityQueue( Comparator<? super Bid> c )
     {
         currentSize = 0;
         cmp = c;
-        array = (AnyType[]) new Object[ DEFAULT_CAPACITY + 1 ];
+        array = new Bid[ DEFAULT_CAPACITY + 1 ];
     }
     
-     
-    /**
-     * Construct a PriorityQueue from another Collection.
-     * @param coll
-     */
-    @SuppressWarnings("unchecked")
-    public PriorityQueue( Collection<? extends AnyType> coll )
-    {
-        cmp = null;
-        currentSize = coll.size( );
-        array = (AnyType[]) new Object[ ( currentSize + 2 ) * 11 / 10 ];
-        
-        int i = 1;
-        for( AnyType item : coll )
-            array[ i++ ] = item;
-        buildHeap( );
-    }
     
     /**
+     * Complexity: O(1)
+     * 
      * Compares lhs and rhs using comparator if
      * provided by cmp, or the default comparator.
+     * 
      */
-    @SuppressWarnings("unchecked")
-    private int compare( AnyType lhs, AnyType rhs )
+    
+    private int compare(Bid lhs, Bid rhs)
     {
-        if( cmp == null )
-            return ((Comparable)lhs).compareTo( rhs );
-        else
-            return cmp.compare( lhs, rhs );    
+        return cmp.compare( lhs, rhs );    
     }
     
     /**
      * Adds an item to this PriorityQueue.
-     * @param x any object.
+     * Complexity O(log n).
+     * 
+     * @param x Bid object.
      * @return true.
      */
-    public boolean add( AnyType x )
+    public boolean add( Bid x )
     {
         assert invariant() : showHeap();
         
         if( currentSize + 1 == array.length )
             doubleArray( );
 
-            // Percolate up
+        // Percolate up
         int hole = ++currentSize;
         array[ 0 ] = x;
         
@@ -115,28 +106,28 @@ public class PriorityQueue<AnyType>
     {
         return currentSize;
     }
-    
-    /**
-     * Make this PriorityQueue empty.
-     */
-    public void clear( )
-    {
-        currentSize = 0;
-    }
+   
     
      
     /**
      * Returns the smallest item in the priority queue.
+     * Complexity O(1)
+     * 
      * @return the smallest item.
      * @throws NoSuchElementException if empty.
      */
-    public AnyType element( )
+    public Bid element( )
     {
         if( isEmpty( ) )
             throw new NoSuchElementException( );
         return array[ 1 ];
     }
     
+    /**
+     * Complexity O(1)
+     * 
+     * @return 
+     */
     public boolean isEmpty() {
         return currentSize == 0;
     }
@@ -144,38 +135,34 @@ public class PriorityQueue<AnyType>
     
     /**
      * Removes the smallest item in the priority queue.
+     * Complexity O(log n)
+     * 
      * @return the smallest item.
      * @throws NoSuchElementException if empty.
      */
-    public AnyType remove( )
+    public Bid remove( )
     {
-        AnyType minItem = element( );
+        assert invariant() : showHeap();
+        
+        Bid minItem = element( );
         array[ 1 ] = array[ currentSize-- ];
         percolateDown( 1 );
-
+        
+        assert invariant() : showHeap();
         return minItem;
     }
 
 
-    /**
-     * Establish heap order property from an arbitrary
-     * arrangement of items. Runs in linear time.
-     */
-    private void buildHeap( )
-    {
-        for( int i = currentSize / 2; i > 0; i-- )
-            percolateDown( i );
-    }
-
 
     /**
      * Internal method to percolate down in the heap.
+     * Complexity O(log n)
      * @param hole the index at which the percolate begins.
      */
     private void percolateDown( int hole )
     {
         int child;
-        AnyType tmp = array[ hole ];
+        Bid tmp = array[ hole ];
 
         for( ; hole * 2 <= currentSize; hole = child )
         {
@@ -195,13 +182,15 @@ public class PriorityQueue<AnyType>
         indexMap.put(array[ hole ], hole);
     }
     /**
+     * Complexity O(log n)
      * Internal method to percolate up in the heap.
+     * 
      * @param hole the index at which the percolate begins.
      */
     private void percolateUp( int hole )
     {
         int child;
-        AnyType tmp = array[ hole ];
+        Bid tmp = array[ hole ];
         
         for( ; hole > 1 ; hole /= 2 ) {
             
@@ -219,22 +208,35 @@ public class PriorityQueue<AnyType>
     
     /**
      * Internal method to extend array.
+     * Complexity O(n)
      */
-    @SuppressWarnings("unchecked")
+    
     private void doubleArray( )
     {
-        AnyType [ ] newArray;
+        Bid [ ] newArray;
 
-        newArray = (AnyType []) new Object[ array.length * 2 ];
+        newArray = (Bid []) new Object[ array.length * 2 ];
         System.arraycopy(array, 0, newArray, 0, array.length);
         array = newArray;
     }
     
-    private int lookup(AnyType x) {
+    /**
+     * Complexity O(1)
+     * @param x
+     * @return 
+     */
+    private int lookup(Bid x) {
         return indexMap.get(x);
     }
     
-    public void update(AnyType old, AnyType notOld) {
+    
+    /**
+     * Complexity O(log n)
+     * 
+     * @param old
+     * @param notOld 
+     */
+    public void update(Bid old, Bid notOld) {
         assert invariant() : showHeap();
         
         int index = lookup(old);
@@ -256,11 +258,16 @@ public class PriorityQueue<AnyType>
         assert invariant() : showHeap();
     }
 
+    /**
+     * Complexity O(n)
+     * 
+     * @return 
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[");
-        for (AnyType e : array) {
+        for (Bid e : array) {
             if (e != null) {
                 sb.append(e.toString())
                   .append(", ");
@@ -272,12 +279,24 @@ public class PriorityQueue<AnyType>
         return sb.toString();
     }
 
-    
+    /**
+     * Complexity O(n)
+     * Invariant:
+     *   * Completness: All rows are full except the last 
+     *                  which is filled from left to right.
+     *   * Heap invariant: Every nodes value is less than 
+     *                     both its children's value
+     *   * Map with index: Every node have a corresponding key in the index map
+     *                     and its value is its index in the array.  
+     * 
+     * 
+     * @return 
+     */
     private boolean invariant() {
         boolean gotNull = false;
         
         // Check completeness
-        for (AnyType e : array) {
+        for (Bid e : array) {
             if (e == null) {
                 gotNull = true;
             } else {
@@ -289,7 +308,7 @@ public class PriorityQueue<AnyType>
         
         // Check heap invariant
         for (int i = 1; i < currentSize; i++) {
-            AnyType e = array[i];
+            Bid e = array[i];
             if (e == null) {
                 break;
             }
