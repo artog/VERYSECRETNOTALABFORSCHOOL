@@ -17,3 +17,4 @@ hs_err_pid*
 /DIT950/lab1/translator.nb/target/
 /DIT950/lab2/client_skel.nb/target/
 /DIT950/lab2/server_skel.nb/target/
+*.zip

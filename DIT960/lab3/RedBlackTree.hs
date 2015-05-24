@@ -25,7 +25,8 @@ import Control.Monad (guard)
 import Data.Maybe (isJust)
 
 -- red-black search trees
-data RBTree a = ...
+data Color = R | B deriving (Show, Eq)
+data RBTree a = Empty | Tree Color a (RBTree a) (RBTree a)
   deriving (Eq, Show, Read)
 
 emptyTree :: RBTree a
