@@ -25,7 +25,7 @@ main = do
         h'      = (logBase 2.0 ((fromIntegral n)+1)) - 1.0 :: Double
         ratio   = h / h'
         valid   = checkTree tree
-        first20 = unwords $ map show $ take 20 $ inorder tree
+        first20 = unwords $ take 20 $ inorder tree
     -- calculate and print statistics
     -- use fromIntegral/ceiling/logBase
     putStr $ "Size: " ++ (show n) ++ "\n"
