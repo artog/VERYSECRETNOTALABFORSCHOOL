@@ -31,13 +31,14 @@ data RBTree a = Empty | Tree Color a (RBTree a) (RBTree a)
   deriving (Eq, Show, Read)
 
 emptyTree :: RBTree a
-emptyTree = undefined
+emptyTree = Empty
 
 isEmpty :: RBTree a -> Bool
-isEmpty Empty       = True
-isEmpty | otherwise = False
+isEmpty Empty         = True
+isEmpty _ | otherwise = False
 
 leftSub :: RBTree a -> RBTree a
+leftSub Empty             = Empty
 leftSub (Tree _ _ left _) = left
 
 rightSub :: RBTree a -> RBTree a
@@ -45,20 +46,23 @@ rightSub Empty = Empty
 rightSub (Tree _ _ _ right) = right
 
 rootVal :: RBTree a -> a
-rootVal (Tree _ (RBTree value) _ _) = value
+rootVal Empty              = undefined
+rootVal (Tree _ value _ _) = value
 
 isBlack :: RBTree a -> Bool
-isBlack (Tree B _ _ _) = True
 isBlack (Tree R _ _ _) = False
+isBlack _              = True
 
 get :: Ord a => a -> RBTree a -> Maybe a
-get value tree | value == rootVal tree = Just $ rootVal  tree
-get value tree | value < rootVal tree  = get  $ leftSub  tree
-get value tree | value > rootVal tree  = get  $ rightSub tree
 get _ Empty = Nothing
+get value tree | value < rootVal tree  = get value $ leftSub  tree
+get value tree | value > rootVal tree  = get value $ rightSub tree
+get value tree | otherwise             = Just $ rootVal  tree
 
 insert :: Ord a => a -> RBTree a -> RBTree a
-insert = undefined
+insert value tree  = makeRootBlack (insert' value tree)
+  where makeRootBlack (Tree _ a l r) = (Tree B a l r) 
+
 
 inorder :: RBTree a -> [a]
 inorder Empty = []
@@ -71,6 +75,57 @@ size (Tree _ _ t1 t2) = 1 + size t1 + size t2
 maxheight :: RBTree a -> Int
 maxheight Empty = 0
 maxheight (Tree _ _ t1 t2) = 1 + max (maxheight t1) (maxheight t2)
+
+
+--------------------------------------------------------------------------------
+-- Helpers
+
+insert' :: Ord a => a -> RBTree a -> RBTree a
+insert' value Empty = (Tree R value Empty Empty)
+insert' value t@(Tree c a l r)
+  | value < a = balanceLeft  (Tree c a (insert' value l) r)
+  | value > a = balanceRight (Tree c a l (insert' value r))
+  | otherwise = t 
+
+balanceLeft :: RBTree a -> RBTree a
+balanceLeft (Tree B z (Tree R y (Tree R x a b) c) d) = 
+  (Tree R y (Tree B x a b) (Tree B z c d))
+balanceLeft (Tree B z (Tree R x a (Tree R y b c)) d) = 
+  (Tree R y (Tree B x a b) (Tree B z c d))
+balanceLeft t = t
+
+balanceRight :: RBTree a -> RBTree a
+balanceRight (Tree B x a (Tree R y b (Tree R z c d))) = 
+  (Tree R y (Tree B x a b) (Tree B z c d))
+balanceRight (Tree B x a (Tree R z (Tree R y b c) d)) = 
+  (Tree R y (Tree B x a b) (Tree B z c d))
+balanceRight t = t
+
+--recolor :: RBTree a -> RBTree a
+--recolor Empty = Empty
+--recolor (Tree R a l r) = (Tree B a l r) 
+--recolor (Tree B a l r) = (Tree R a (recolor l) (recolor r))
+
+
+--rotateLeft :: RBTree a -> RBTree a 
+--rotateLeft (Tree cp p a (Tree cq q b c)) = (Tree cq q (Tree cp p a b) c)
+--rotateLeft t = t
+
+--rotateRight :: RBTree a -> RBTree a 
+--rotateRight (Tree cq q (Tree cp p a b) c) = (Tree cp p a (Tree cq q b c))
+--rotateRight t = t
+
+--leftleft :: RBTree a -> RBTree a 
+--leftleft = rotateRight
+
+--leftright :: RBTree a -> RBTree a 
+--leftright (Tree c e a b) = rotateRight (Tree c e (rotateLeft a) b)
+
+--rightleft :: RBTree a -> RBTree a 
+--rightleft = rotateRight
+
+--rightright :: RBTree a -> RBTree a 
+--rightright = rotateLeft
 
 --------------------------------------------------------------------------------
 -- Optional function
