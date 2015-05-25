@@ -34,20 +34,22 @@ emptyTree :: RBTree a
 emptyTree = undefined
 
 isEmpty :: RBTree a -> Bool
-isEmpty = undefined
+isEmpty Empty       = True
+isEmpty | otherwise = False
 
 leftSub :: RBTree a -> RBTree a
-leftSub = undefined
+leftSub (Tree _ _ left _) = left
 
 rightSub :: RBTree a -> RBTree a
 rightSub Empty = Empty
-rightSub (Tree _ _ _ t2) = t2
+rightSub (Tree _ _ _ right) = right
 
 rootVal :: RBTree a -> a
-rootVal = undefined
+rootVal (Tree _ (RBTree value) _ _) = value
 
 isBlack :: RBTree a -> Bool
-isBlack = undefined
+isBlack (Tree B _ _ _) = True
+isBlack (Tree R _ _ _) = False
 
 get :: Ord a => a -> RBTree a -> Maybe a
 get = undefined
