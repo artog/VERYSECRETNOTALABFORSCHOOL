@@ -69,7 +69,7 @@ public class PriorityQueue
     
     /**
      * Adds an item to this PriorityQueue.
-     * Complexity O(log n).
+     * Complexity O(log n) or worst case O(N) when its a very unbalanced tree.
      * 
      * @param x Bid object.
      * @return true.
@@ -83,16 +83,8 @@ public class PriorityQueue
 
         // Percolate up
         int hole = ++currentSize;
-        array[ 0 ] = x;
-        
-        for( ; compare( x, array[ hole / 2 ] ) < 0; hole /= 2 ) {
-            array[ hole ] = array[ hole / 2 ]; 
-            indexMap.put(array[ hole ], hole);
-        }
-        
-        array[ hole ] = x;
-        indexMap.put(array[ hole ], hole);
-        
+        array[hole] = x;
+        percolateUp(hole);  
         
         assert invariant() : showHeap();
         return true;
@@ -226,7 +218,8 @@ public class PriorityQueue
      * @return 
      */
     private int lookup(Bid x) {
-        return indexMap.get(x);
+        Integer index = indexMap.get(x);
+        return index == null ? -1 : index;
     }
     
     
@@ -241,10 +234,11 @@ public class PriorityQueue
         
         int index = lookup(old);
         
-        if ( index == array.length ) {
-            doubleArray();
+        if (index == -1) {
+            add(notOld);
+            return;
         }
-        
+
         array[index] = notOld;
         indexMap.put(notOld, index);
         indexMap.remove(old);
@@ -296,22 +290,15 @@ public class PriorityQueue
         boolean gotNull = false;
         
         // Check completeness
-        for (Bid e : array) {
-            if (e == null) {
-                gotNull = true;
-            } else {
-                if (gotNull) {
-                    return false;
-                }
+        for (int i = 1; i <= currentSize; i++) {
+            if (array[i] == null) {
+                return false;
             }
         }
         
         // Check heap invariant
         for (int i = 1; i < currentSize; i++) {
             Bid e = array[i];
-            if (e == null) {
-                break;
-            }
             
             int rChild = 2*i+1;
             int lChild = 2*i;
