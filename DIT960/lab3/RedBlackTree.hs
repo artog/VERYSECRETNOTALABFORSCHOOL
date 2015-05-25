@@ -52,7 +52,10 @@ isBlack (Tree B _ _ _) = True
 isBlack (Tree R _ _ _) = False
 
 get :: Ord a => a -> RBTree a -> Maybe a
-get = undefined
+get value tree | value == rootVal tree = Just $ rootVal  tree
+get value tree | value < rootVal tree  = get  $ leftSub  tree
+get value tree | value > rootVal tree  = get  $ rightSub tree
+get _ Empty = Nothing
 
 insert :: Ord a => a -> RBTree a -> RBTree a
 insert = undefined
