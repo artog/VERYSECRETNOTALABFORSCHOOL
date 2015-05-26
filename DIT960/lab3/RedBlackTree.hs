@@ -76,7 +76,8 @@ get value tree
 -- If the root of the tree is red we recolour it.
 insert :: Ord a => a -> RBTree a -> RBTree a
 insert value tree  = makeRootBlack (insert' value tree)
-  where makeRootBlack (Tree _ a l r) = (Tree B a l r) 
+  where makeRootBlack Empty = Empty 
+        makeRootBlack (Tree _ a l r) = (Tree B a l r) 
 
 -- O(n)
 inorder :: RBTree a -> [a]
