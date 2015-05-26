@@ -71,7 +71,7 @@ get value tree
 -- O(log n)
 -- Inserts a value in the tree as a red node. If the new node's parent
 -- is a red node we have broken the invariant. Then we rotate and recolor
--- the tree, using pattern matching, to satisfy the invariant.
+-- the tree bottom up, using pattern matching, to satisfy the invariant.
 -- There are four different cases of rebalancing that needs to be done
 -- depending on if the new node and its parent is a left/right node. 
 -- If the root of the tree is red we recolour it.
@@ -142,12 +142,14 @@ checkTree root =
   isJust (checkBlackHeight root) &&
   isBlack root)
 
+-- O(n)
 -- True if the given list is ordered
 isSorted :: Ord a => [a] -> Bool
 isSorted [] = True
 isSorted (_:[]) = True
 isSorted (a:b:l) = (a <= b) && (isSorted (b:l))
 
+--O(n)
 -- True if every red node only has black children
 checkRedParents :: RBTree a -> Bool
 checkRedParents Empty = True
@@ -158,6 +160,7 @@ checkRedParents (Tree _ _ t1 t2) | otherwise = and [valid, checkRedParents t1, c
     right = isBlack t2
     valid = left && right
 
+--O(n)
 -- If the number of black nodes from each leaf to the root
 -- are the same, then that number is returned,
 -- otherwise returns Nothing
