@@ -4,7 +4,6 @@
 
 module RedBlackTree (
   RBTree,        -- type of red-black search trees
-  tree1,
   emptyTree,     -- RBTree a
   isEmpty,       -- RBTree a -> Bool
   leftSub,       -- RBTree a -> RBTree a
@@ -185,10 +184,3 @@ checkBlackHeight tree
         return lh
 
 --------------------------------------------------------------------------------
-
-tree1 :: RBTree Int
-tree1 = (Tree B 5 (Tree R 2 (Tree B 1 Empty Empty) Empty) (Tree R 6 Empty Empty))
-tree2 :: RBTree Int
-tree2 = (Tree R 5 (Tree B 2 (Tree R 3 Empty Empty) Empty) (Tree B 6 Empty Empty))
-tree3 :: RBTree Int
-tree3 = (Tree R 5 (Tree R 2 (Tree R 1 Empty Empty) Empty) (Tree B 6 Empty Empty))
