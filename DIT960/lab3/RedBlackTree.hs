@@ -102,7 +102,7 @@ maxheight (Tree _ _ t1 t2) = 1 + max (maxheight t1) (maxheight t2)
 -- O(n)
 inorder' :: RBTree a -> [a] -> [a]
 inorder' Empty acc = acc
-inorder' (RBTree _ a l r) acc = inorder' l (v : inorder' r acc)
+inorder' (Tree _ a l r) acc = inorder' l (a : inorder' r acc)
 
 -- O(log n)
 -- For description see function insert's comment
