@@ -81,8 +81,9 @@ insert value tree  = makeRootBlack (insert' value tree)
 
 -- O(n)
 inorder :: RBTree a -> [a]
-inorder Empty = []
-inorder (Tree _ a t1 t2) = (inorder t1) ++ [a] ++ (inorder t2) 
+inorder tree = inorder' tree []
+
+
 
 -- O(n)
 size :: RBTree a -> Int
@@ -97,6 +98,11 @@ maxheight (Tree _ _ t1 t2) = 1 + max (maxheight t1) (maxheight t2)
 
 --------------------------------------------------------------------------------
 -- Helpers
+
+-- O(n)
+inorder' :: RBTree a -> [a] -> [a]
+inorder' Empty acc = acc
+inorder' (RBTree _ a l r) acc = inorder' l (v : inorder' r acc)
 
 -- O(log n)
 -- For description see function insert's comment
