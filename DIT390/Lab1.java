@@ -3,7 +3,7 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Lab1Copy {
+public class Lab1 {
     
     public final Semaphore topStation = new Semaphore(1,true);
     public final Semaphore crossing = new Semaphore(1,true);
@@ -20,10 +20,10 @@ public class Lab1Copy {
     public static final int MAX_SPEED = 20;
 
     public static void main(String[] args) {
-        Lab1Copy i = new Lab1Copy(args);
+        Lab1 i = new Lab1(args);
     }
 
-    public Lab1Copy(String[] args) {
+    public Lab1(String[] args) {
         TSimInterface tsi = TSimInterface.getInstance();
         int speed1 = 10, speed2 = 10;
         int simSpeed = 100;
@@ -108,7 +108,7 @@ public class Lab1Copy {
         }
         static TSimInterface tsi = TSimInterface.getInstance();
 
-        Lab1Copy parent;
+        Lab1 parent;
         
         // Train Id enum
         final int TOP = 1;
@@ -128,7 +128,7 @@ public class Lab1Copy {
         final int simSpeed;
         boolean stationStop = false;
 
-        public Train(int speed, int id, Lab1Copy parent, int simSpeed) {
+        public Train(int speed, int id, Lab1 parent, int simSpeed) {
             this.simSpeed = simSpeed;
             this.parent = parent;
             this.id = id;
