@@ -210,12 +210,14 @@ public class Lab1 {
                         // aquire lock 3
                         System.err.println("211: Aquire lock rightBend");
                         parent.rightBend.acquire();
+                        track = Track.Five;
                         // switch b to top
                         tsi.setSwitch(15, 9, TSimInterface.SWITCH_RIGHT);
                     } else {
                         // aquire lock 5
                         System.err.println("217: Aquire lock leftBend");
                         parent.leftBend.acquire();
+                        track = Track.Eight;
                         // switch c to top
                         tsi.setSwitch(4, 9, TSimInterface.SWITCH_LEFT);
                     }
@@ -228,6 +230,7 @@ public class Lab1 {
                         // aquire lock 3
                         System.err.println("229: Aquire lock rightBend");
                         parent.rightBend.acquire();
+                        track = Track.Five;
                         // switch b to bottom
                         tsi.setSwitch(15, 9, TSimInterface.SWITCH_LEFT);
                     } else {
@@ -235,6 +238,7 @@ public class Lab1 {
                         System.err.println("235: Aquire lock leftBend");
                         parent.leftBend.acquire();
                         // switch c to bottom
+                        track = Track.Eight;
                         tsi.setSwitch(4, 9, TSimInterface.SWITCH_RIGHT);
                     }
                     break;
