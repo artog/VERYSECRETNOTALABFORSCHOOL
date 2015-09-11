@@ -1,0 +1,32 @@
+Our solution have a state per train, where we keep track of which track the train is on. 
+We then act based on that when the train hits a sensor. 
+We divided the track into 6 zones, each with its designated semaphore.
+At a station we noticed that delaying the stop to when the train leaves 
+the sensor prevented problems at lower speeds (train not actually passing the sensor).
+
+Placement of the sensors
+We have a sensor at each of the direction in a crossing/switch, 
+but 2 tiles away from the actual crossing/switch. 
+This is to compensate the stop time at higher speeds. 
+There is also one sensor at each station.
+
+Choice of critical sections
+We chose to have one semaphore (critical section) for 
+each single track (the left bend and the right bend) 
+to prevent trains from entering the same section. 
+We decided that one semaphore per double track was enough, 
+so that if the semaphore is available the train 
+chooses the top, otherwise the bottom track.
+
+
+Maximum train speed and the reason for it
+Based on the sensor position we tested (by increasing 
+it until crash) it to be 20. It is possible to 
+increase it by moving the sensors further from 
+the crossings/switches, but that would mean a 
+loss of fluidity at lower speeds. 
+
+How you tested your solution
+We ran several runs in parallell at different 
+speeds (e.g. 1/20, 5/15, 10/10, 20/20, 4/13, etc) 
+for long times (5hrs or more) withot crashes.
