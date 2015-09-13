@@ -3,20 +3,9 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Lab1 {
-    
-    public final Semaphore topStation = new Semaphore(1,true);
-    public final Semaphore crossing = new Semaphore(1,true);
-    public final Semaphore rightBend = new Semaphore(1,true);
-    public final Semaphore overtake = new Semaphore(1,true);
-    public final Semaphore leftBend = new Semaphore(1,true);
-    public final Semaphore bottomStation = new Semaphore(1,true);
-    
-    public static final boolean LEFT_SWITCH = false;
-    public static final boolean RIGHT_SWITCH = true;
-    public static final boolean PRIMARY = true;
-    public static final boolean SECONDARY = false;
+import static TSim.TSimInterface.*;
 
+public class Lab1 {
     public static final int MAX_SPEED = 20;
 
     public static void main(String[] args) {
@@ -54,298 +43,257 @@ public class Lab1 {
     }
 
     private void startTrains(int trainSpeed1, int trainSpeed2, int simSpeed) {
-        Train train1 = new Train(trainSpeed1, 1, this, simSpeed);
-        Train train2 = new Train(trainSpeed2, 2, this, simSpeed);
-        
+        Train train1 = new Train(trainSpeed1, 1, simSpeed);
+        Train train2 = new Train(trainSpeed2, 2, simSpeed);
         train1.start();
         train2.start();
-        
     }
-    
-    
-    static class Train extends Thread {
+}
 
-        enum Switch{
-            A(17, 7, RIGHT_SWITCH),
-            B(15, 9, RIGHT_SWITCH),
-            C(4,  9, LEFT_SWITCH),
-            D(3, 11, LEFT_SWITCH);
+class Train extends Thread {   
+    private static final TSimInterface tsi = TSimInterface.getInstance();
 
-            private final int x;
-            private final int y;
-            private final boolean direction;
-
-            Switch(int x, int y, boolean direction)
-            {
-                this.x = x;
-                this.y = y;
-                this.direction = direction;
-            }
-
-            public void setTrack(boolean toPrimary)
-                throws CommandException
-            {
-                if(toPrimary){
-                    tsi.setSwitch(x, y, direction == LEFT_SWITCH ? TSimInterface.SWITCH_LEFT : TSimInterface.SWITCH_RIGHT);
-                }
-                else{
-                    tsi.setSwitch(x, y, direction == LEFT_SWITCH ? TSimInterface.SWITCH_RIGHT : TSimInterface.SWITCH_LEFT);
-                }
-            }
-        }
-
-        enum Track { 
-            One,
-            Two,
-            Three,
-            Four,
-            Five,
-            Six,
-            Seven,
-            Eight,
-            Nine,
-            Ten
-        }
-        static TSimInterface tsi = TSimInterface.getInstance();
-
-        Lab1 parent;
+    private static final Semaphore topStation = new Semaphore(0,true);
+    private static final Semaphore crossing = new Semaphore(1,true);
+    private static final Semaphore rightBend = new Semaphore(1,true);
+    private static final Semaphore overtake = new Semaphore(1,true);
+    private static final Semaphore leftBend = new Semaphore(1,true);
+    private static final Semaphore bottomStation = new Semaphore(0,true);
+         
+    // Train Id enum
+    final int TOP_TRAIN = 1;
+    final int BOTTOM_TRAIN = 2;
         
-        // Train Id enum
-        final int TOP = 1;
-        final int BOTTOM = 2;
-        
-        // Wait time in milliseconds
-        final int TIME_AT_STATION = 2000;
+    // Wait time in milliseconds
+    final int TIME_AT_STATION = 2000;
 
+    int id;
+    Track track;
 
+    int direction;
+    int speed;
+    boolean releaseSensor = true;
+    final int simSpeed;
+    boolean stationStop = false;
 
-        int id;
-        Track track;
+    public Train(int speed, int id, int simSpeed) {
+        this.simSpeed = simSpeed;
+        this.id = id;
+        this.speed = speed;
 
-        int direction;
-        int speed;
-        boolean releaseSensor = true;
-        final int simSpeed;
-        boolean stationStop = false;
-
-        public Train(int speed, int id, Lab1 parent, int simSpeed) {
-            this.simSpeed = simSpeed;
-            this.parent = parent;
-            this.id = id;
-            this.speed = speed;
-
-            try {
-                if (id == TOP) {
-                    
-                    track = Track.One;
-                    this.direction = 1;
-                    parent.topStation.acquire();
-                    
-                } else if (id == BOTTOM) {
-                    
-                    track = Track.Nine;
-                    this.direction = -1;
-                    parent.bottomStation.acquire();
-                    
-                } else {
-                    throw new RuntimeException("Unknown train id");
-                }
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Lab1.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+        if (id == TOP_TRAIN) {   
+            track = Track.One;
+            this.direction = 1;           
         }
+        else if (id == BOTTOM_TRAIN) {
+            track = Track.Nine;
+            this.direction = -1;    
+        } else {
+            throw new RuntimeException("Unknown train id");
+        }
+    }
         
-        @Override
-        public void run() {
-            try {
-                startTrain();
-            } catch (CommandException ex) {
-                Logger.getLogger(Lab1.class.getName()).log(Level.SEVERE, "Train "+id, ex);
-            }
+    @Override
+    public void run() {
+        try {
+            startTrain();
             while (true) {
-                try {
-                    SensorEvent e = tsi.getSensor(id);
-                    handleSensor(e);
-                    
-                } catch (CommandException ex) {
-                    Logger.getLogger(Lab1.class.getName()).log(Level.SEVERE, "Train "+id, ex);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Lab1.class.getName()).log(Level.SEVERE, "Train "+id, ex);
-                }
+                SensorEvent e = tsi.getSensor(id);
+                handleSensor(e);
             }
+        } catch (CommandException | InterruptedException ex) {
+            Logger.getLogger(Lab1.class.getName()).log(Level.SEVERE, "Train "+id, ex);
         }
+    }
 
+    public void handleSensor(SensorEvent e) 
+        throws InterruptedException, CommandException 
+    {
+        if (e.getStatus() == SensorEvent.INACTIVE) {
+            if (stationStop) {
+                stopTrain();
+                int waitTime = TIME_AT_STATION + 2 * simSpeed * Math.abs(speed);
+                Thread.sleep(waitTime);
 
-        public void handleSensor(SensorEvent e) 
-            throws InterruptedException, CommandException 
-        {
-            if (e.getStatus() == SensorEvent.INACTIVE) {
-                if (stationStop) {
-                    stopTrain();
-                    //TODO: Stations
-                    int waitTime = TIME_AT_STATION + 2 * simSpeed * Math.abs(speed);
-                    Thread.sleep(waitTime);
-
-                    // Change direction and speed
-                    direction *= -1;
-                    speed *= -1;
-                    startTrain();
-                    stationStop = false;
-                }
-                return;
+                // Change direction and speed
+                direction *= -1;
+                speed *= -1;
+                startTrain();
+                stationStop = false;
             }
+            return;
+        }
             
-            if (releaseSensor) { 
-                switch (track) {
-                    case One:
-                    case Two:
-                        if (direction < 0) {
-                            parent.crossing.release();
-                        }
-                        break;
-                    case Three:
-                    case Four:
-                        if (direction > 0) {
-                            parent.crossing.release();
-                        } else {
-                            parent.rightBend.release();
-                        }
-                        break;
-                    case Six:
-                    case Seven:
-                        if (direction > 0) {
-                            parent.rightBend.release();
-                        } else {
-                            parent.leftBend.release();
-                        }
-                        break;
-                    case Nine:
-                    case Ten:
-                        if (direction > 0) {
-                            parent.leftBend.release();
-                        }
-                        
-                }
-                releaseSensor = false;
-                return; 
-            }
-            
-            stopTrain();
-            
+        if (releaseSensor) { 
             switch (track) {
-                case One: 
+                case One:
                 case Two:
-                    if (direction > 0) {
-                        parent.crossing.acquire();
-
-                        if (track == Track.One) {
-                            track = Track.Three;
-                        } else {
-                            track = Track.Four;
-                        }
-                    } else {
-                        stationStop = true;
+                    if (direction < 0) {
+                        crossing.release();
                     }
                     break;
-
                 case Three:
                 case Four:
-                    if (direction < 0) {
-                        parent.crossing.acquire();
-                        track = track == Track.Three ? Track.One : Track.Two;
+                    if (direction > 0) {
+                        crossing.release();
                     } else {
-                        parent.rightBend.acquire();
-                        if (track == Track.Three) {
-                            parent.topStation.release();
-                            Switch.A.setTrack(PRIMARY);
-                        } else {
-                            Switch.A.setTrack(SECONDARY);
-                        }
-                        track = Track.Five;
-                    }
-                    break;
-                case Five:
-                    if (direction < 0) {
-                        boolean trackAvailable = parent.topStation.tryAcquire();
-                        Switch.A.setTrack(trackAvailable);
-                        track = trackAvailable ? Track.Three : Track.Four;
-                    }
-                    else{
-                        boolean trackAvailable = parent.overtake.tryAcquire();
-                        Switch.B.setTrack(trackAvailable);
-                        track = trackAvailable ? Track.Six : Track.Seven;
+                        rightBend.release();
                     }
                     break;
                 case Six:
-                    if (direction < 0) {
-                        
-                        parent.rightBend.acquire();
-                        Switch.B.setTrack(PRIMARY);
-                        track = Track.Five;
-                    } else {
-                        parent.leftBend.acquire();
-                        Switch.C.setTrack(PRIMARY);
-                        track = Track.Eight;
-                    }
-                    parent.overtake.release();
-                    break;
                 case Seven:
-                    if (direction < 0) {
-                        parent.rightBend.acquire();
-                        Switch.B.setTrack(SECONDARY);
-                        track = Track.Five;
+                    if (direction > 0) {
+                        rightBend.release();
                     } else {
-                        parent.leftBend.acquire();
-                        Switch.C.setTrack(SECONDARY);
-                        track = Track.Eight;
-                    }
-                    break;
-                case Eight:
-                    if (direction < 0) {
-                        boolean trackAvailable = parent.overtake.tryAcquire();
-                        Switch.C.setTrack(trackAvailable);
-                        track = trackAvailable ? Track.Six : Track.Seven;
-                    }
-                    else{
-                        boolean trackAvailable = parent.bottomStation.tryAcquire();
-                        Switch.D.setTrack(trackAvailable);
-                        track = trackAvailable ? Track.Nine : Track.Ten;
+                        leftBend.release();
                     }
                     break;
                 case Nine:
                 case Ten:
-                    if (direction < 0) {
-                        parent.leftBend.acquire();
-                        if (track == Track.Nine) {
-                            parent.bottomStation.release();
-                            Switch.D.setTrack(PRIMARY);
-                        } else {
-                            Switch.D.setTrack(SECONDARY);
-                        }
-                        track = Track.Eight;
-                    } else {
-                        stationStop = true;
+                    if (direction > 0) {
+                        leftBend.release();
                     }
-                    break;
-
-                default: 
-                    throw new RuntimeException();
-
-
+                    break;   
             }
-            startTrain();
-            releaseSensor = true;
+            releaseSensor = false;
+            return; 
         }
-
-
-        public void startTrain() throws CommandException { 
-            tsi.setSpeed(id,speed); 
+        
+        stopTrain();   
+        switch (track) {
+            case One: 
+            case Two:
+                if (direction > 0) {
+                    crossing.acquire();
+                    track = track == Track.One ? Track.Three : Track.Four;
+                } else {
+                    stationStop = true;
+                }
+                break;
+            case Three:
+            case Four:
+                if (direction < 0) {
+                    crossing.acquire();
+                    track = track == Track.Three ? Track.One : Track.Two;
+                } else {
+                    enterSingleTrack(rightBend, track == Track.Three ? topStation : null, Switch.A);
+                    track = Track.Five;
+                }
+                break;
+            case Five:
+                if (direction < 0) {
+                    boolean trackAvailable = enterDualTrack(topStation, Switch.A);
+                    track = trackAvailable ? Track.Three : Track.Four;
+                }
+                else{
+                    boolean trackAvailable = enterDualTrack(overtake, Switch.B);
+                    track = trackAvailable ? Track.Six : Track.Seven;
+                }
+                break;
+            case Six:
+            case Seven:
+                if (direction < 0) {
+                    enterSingleTrack(rightBend, track == Track.Six ? overtake : null, Switch.B);
+                    track = Track.Five;
+                } else {
+                    enterSingleTrack(leftBend, track == Track.Six ? overtake : null, Switch.C);
+                    track = Track.Eight;
+                }
+                break;
+            case Eight:
+                if (direction < 0) {
+                    boolean trackAvailable = enterDualTrack(overtake, Switch.C);
+                    track = trackAvailable ? Track.Six : Track.Seven;
+                }
+                else{
+                    boolean trackAvailable = enterDualTrack(bottomStation, Switch.D);
+                    track = trackAvailable ? Track.Nine : Track.Ten;
+                }
+                break;
+            case Nine:
+            case Ten:
+                if (direction < 0) {
+                    enterSingleTrack(leftBend, track == Track.Nine ? bottomStation : null, Switch.D);
+                    track = Track.Eight;
+                } else {
+                    stationStop = true;
+                }
+                break;
         }
-        public void stopTrain() throws CommandException { 
-            tsi.setSpeed(id,0); 
+        startTrain();
+        releaseSensor = true;
+    }
+
+    public void enterSingleTrack(Semaphore lockToAcquire, Semaphore lockToRelease, Switch s)
+        throws CommandException, InterruptedException
+    {
+        lockToAcquire.acquire();
+        if(lockToRelease != null){
+            lockToRelease.release();
+            s.setTrack(Switch.PRIMARY);
+        }
+        else{
+            s.setTrack(Switch.SECONDARY);
         }
     }
 
-}
+    public boolean enterDualTrack(Semaphore lockToAcquire, Switch s) 
+        throws CommandException
+    {
+        boolean primaryAvailable = lockToAcquire.tryAcquire();
+        s.setTrack(primaryAvailable);
+        return primaryAvailable;
+    }
 
+    public void startTrain() throws CommandException { 
+        tsi.setSpeed(id,speed); 
+    }
+    public void stopTrain() throws CommandException { 
+        tsi.setSpeed(id,0); 
+    }
+
+    enum Switch{
+        A(17, 7, SWITCH_RIGHT),
+        B(15, 9, SWITCH_RIGHT),
+        C(4,  9, SWITCH_LEFT),
+        D(3, 11, SWITCH_LEFT);
+
+        public static final boolean PRIMARY   = true;
+        public static final boolean SECONDARY = false;
+        
+        private final int x;
+        private final int y;
+        private final int direction;
+
+        Switch(int x, int y, int direction)
+        {
+            this.x = x;
+            this.y = y;
+            this.direction = direction;
+        }
+
+        public void setTrack(boolean toPrimary)
+            throws CommandException
+        {
+            if(toPrimary){
+                tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_LEFT : SWITCH_RIGHT);
+            }
+            else{
+                tsi.setSwitch(x, y, direction == SWITCH_RIGHT ? SWITCH_RIGHT : SWITCH_LEFT);
+            }
+        }
+    }
+
+    enum Track { 
+        One,
+        Two,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        Ten
+    }
+}

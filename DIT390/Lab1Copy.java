@@ -20,7 +20,7 @@ public class Lab1Copy {
     public static final int MAX_SPEED = 20;
 
     public static void main(String[] args) {
-        Lab1Copy i = new Lab1Copy(args);
+        Lab1 i = new Lab1(args);
     }
 
     public Lab1Copy(String[] args) {
@@ -136,15 +136,17 @@ public class Lab1Copy {
 
             try {
                 if (id == TOP) {
+                    
                     track = Track.One;
-                    System.err.println("Aquire lock topStation");
                     this.direction = 1;
                     parent.topStation.acquire();
+                    
                 } else if (id == BOTTOM) {
-                        track = Track.Nine;
-                        System.err.println("Aquire lock bottomStation");
-                        this.direction = -1;
-                        parent.bottomStation.acquire();
+                    
+                    track = Track.Nine;
+                    this.direction = -1;
+                    parent.bottomStation.acquire();
+                    
                 } else {
                     throw new RuntimeException("Unknown train id");
                 }
@@ -164,8 +166,6 @@ public class Lab1Copy {
             while (true) {
                 try {
                     SensorEvent e = tsi.getSensor(id);
-                    
-                    System.err.println(System.nanoTime()+"Handling sensor: "+e);
                     handleSensor(e);
                     
                 } catch (CommandException ex) {
@@ -201,14 +201,12 @@ public class Lab1Copy {
                     case One:
                     case Two:
                         if (direction < 0) {
-                            System.err.println("Train "+id+" release crossing");
                             parent.crossing.release();
                         }
                         break;
                     case Three:
                     case Four:
                         if (direction > 0) {
-                            System.err.println("Train "+id+" release crossing");
                             parent.crossing.release();
                         } else {
                             parent.rightBend.release();
@@ -230,7 +228,6 @@ public class Lab1Copy {
                         
                 }
                 releaseSensor = false;
-                System.err.println("Release sensor.");
                 return; 
             }
             
@@ -254,20 +251,15 @@ public class Lab1Copy {
 
                 case Three:
                 case Four:
-                    System.err.println("case 3/4");
                     if (direction < 0) {
-                        System.err.println("dir 1");
                         parent.crossing.acquire();
                         track = track == Track.Three ? Track.One : Track.Two;
                     } else {
-                        System.err.println("dir -1");
                         parent.rightBend.acquire();
                         if (track == Track.Three) {
                             parent.topStation.release();
                             Switch.A.setTrack(PRIMARY);
-                            System.err.println("Set A to primary");
                         } else {
-                            System.err.println("Set A to secondary");
                             Switch.A.setTrack(SECONDARY);
                         }
                         track = Track.Five;
@@ -344,16 +336,13 @@ public class Lab1Copy {
             }
             startTrain();
             releaseSensor = true;
-            System.err.println(String.format("Train %d on track %s", id, track));
         }
 
 
         public void startTrain() throws CommandException { 
-            System.err.println("Starting train "+id+" with speed "+direction);
             tsi.setSpeed(id,speed); 
         }
         public void stopTrain() throws CommandException { 
-            System.err.println("Stopping train "+id);
             tsi.setSpeed(id,0); 
         }
     }
