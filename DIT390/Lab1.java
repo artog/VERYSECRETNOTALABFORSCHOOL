@@ -76,6 +76,9 @@ class Train extends Thread {
     final int simSpeed;
     boolean stationStop = false;
 
+    private Semaphore releaseLock = null;
+
+
     public Train(int speed, int id, int simSpeed) {
         this.simSpeed = simSpeed;
         this.id = id;
@@ -83,11 +86,11 @@ class Train extends Thread {
 
         if (id == TOP_TRAIN) {   
             track = Track.One;
-            this.direction = 1;           
+            this.direction = 1;  
         }
         else if (id == BOTTOM_TRAIN) {
             track = Track.Nine;
-            this.direction = -1;    
+            this.direction = -1;
         } else {
             throw new RuntimeException("Unknown train id");
         }
@@ -155,6 +158,14 @@ class Train extends Thread {
                     }
                     break;   
             }
+
+            // Release saved lock
+            if (releaseLock != null) {
+                releaseLock.release();
+                releaseLock = null;
+                System.err.println("Releasing special case");
+            }
+
             releaseSensor = false;
             return; 
         }
@@ -228,8 +239,9 @@ class Train extends Thread {
         throws CommandException, InterruptedException
     {
         lockToAcquire.acquire();
-        if(lockToRelease != null){
-            lockToRelease.release();
+        if (lockToRelease != null) {
+            // Save for release at next sensor
+            releaseLock = lockToRelease;
             s.setTrack(Switch.PRIMARY);
         }
         else{
@@ -279,21 +291,12 @@ class Train extends Thread {
                 tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_LEFT : SWITCH_RIGHT);
             }
             else{
-                tsi.setSwitch(x, y, direction == SWITCH_RIGHT ? SWITCH_RIGHT : SWITCH_LEFT);
+                tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_RIGHT : SWITCH_LEFT);
             }
         }
     }
 
     enum Track { 
-        One,
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Ten
+        One,Two,Three,Four,Five,Six,Seven,Eight,Nine,Ten
     }
 }
