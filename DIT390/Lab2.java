@@ -54,14 +54,7 @@ public class Lab2 {
 }
 
 class Train extends Thread {   
-    private static final TSimInterface tsi = TSimInterface.getInstance();
-
-    private static final Semaphore topStation = new Semaphore(0,true);
-    private static final Semaphore crossing = new Semaphore(1,true);
-    private static final Semaphore rightBend = new Semaphore(1,true);
-    private static final Semaphore overtake = new Semaphore(1,true);
-    private static final Semaphore leftBend = new Semaphore(1,true);
-    private static final Semaphore bottomStation = new Semaphore(0,true);
+    public static final TSimInterface tsi = TSimInterface.getInstance();
          
     // Train Id enum
     final int TOP_TRAIN = 1;
@@ -72,14 +65,15 @@ class Train extends Thread {
 
     int id;
     Track track;
+    Track oldTrack;
 
     int direction;
     int speed;
-    boolean releaseSensor = true;
     final int simSpeed;
     boolean stationStop = false;
 
-    private Semaphore releaseLock = null;
+
+    private final static TrackMonitor monitor = new TrackMonitor();
 
 
     public Train(int speed, int id, int simSpeed) {
@@ -87,13 +81,16 @@ class Train extends Thread {
         this.id = id;
         this.speed = speed;
 
+
         if (id == TOP_TRAIN) {   
             track = Track.One;
             this.direction = 1;  
+            this.oldTrack = Track.One;
         }
         else if (id == BOTTOM_TRAIN) {
             track = Track.Nine;
             this.direction = -1;
+            this.oldTrack = Track.Nine;
         } else {
             throw new RuntimeException("Unknown train id");
         }
@@ -115,6 +112,7 @@ class Train extends Thread {
     public void handleSensor(SensorEvent e) 
         throws InterruptedException, CommandException 
     {
+
         if (e.getStatus() == SensorEvent.INACTIVE) {
             if (stationStop) {
                 stopTrain();
@@ -125,60 +123,52 @@ class Train extends Thread {
                 direction *= -1;
                 speed *= -1;
                 startTrain();
+                oldTrack = null;
                 stationStop = false;
+                skipAfterStation = true;
             }
             return;
         }
             
-        if (releaseSensor) { 
-            switch (track) {
+        if (oldTrack != null) { 
+            // if (((oldTrack == Track.One || oldTrack == Track.Two) && direction > 0 )
+            //     || ((oldTrack == Track.Three || oldTrack == Track.Four) && direction < 0) ) {
+            //     monitor.leaveTrack(Track.Crossing);
+            // } else {
+            //     monitor.leaveTrack(oldTrack);
+            // }
+
+            switch (oldTrack) {
                 case One:
                 case Two:
-                    if (direction < 0) {
-                        crossing.release();
+                    if (direction > 0) {
+                        monitor.leaveTrack(Track.Crossing);
                     }
                     break;
                 case Three:
                 case Four:
-                    if (direction > 0) {
-                        crossing.release();
+                    if (direction < 0) {
+                        monitor.leaveTrack(Track.Crossing);
                     } else {
-                        rightBend.release();
                     }
                     break;
-                case Six:
-                case Seven:
-                    if (direction > 0) {
-                        rightBend.release();
-                    } else {
-                        leftBend.release();
-                    }
-                    break;
-                case Nine:
-                case Ten:
-                    if (direction > 0) {
-                        leftBend.release();
-                    }
+                default:
+                    monitor.leaveTrack(oldTrack);
                     break;   
             }
 
-            // Release saved lock
-            if (releaseLock != null) {
-                releaseLock.release();
-                releaseLock = null;
-                System.err.println("Releasing special case");
-            }
 
-            releaseSensor = false;
+            oldTrack = null;
             return; 
         }
         
-        stopTrain();   
+        stopTrain(); 
+        oldTrack = track; 
         switch (track) {
             case One: 
             case Two:
                 if (direction > 0) {
-                    crossing.acquire();
+                    monitor.enterTrack(id, Track.Crossing);
                     track = track == Track.One ? Track.Three : Track.Four;
                 } else {
                     stationStop = true;
@@ -187,122 +177,136 @@ class Train extends Thread {
             case Three:
             case Four:
                 if (direction < 0) {
-                    crossing.acquire();
+                    monitor.enterTrack(id, Track.Crossing);
                     track = track == Track.Three ? Track.One : Track.Two;
                 } else {
-                    enterSingleTrack(rightBend, track == Track.Three ? topStation : null, Switch.A);
-                    track = Track.Five;
+                    track = enterSingleTrack(Track.Five , Switch.A);
                 }
                 break;
             case Five:
                 if (direction < 0) {
-                    boolean trackAvailable = enterDualTrack(topStation, Switch.A);
-                    track = trackAvailable ? Track.Three : Track.Four;
+                    track = enterDualTrack(Track.Three, Track.Four, Switch.A);
                 }
                 else{
-                    boolean trackAvailable = enterDualTrack(overtake, Switch.B);
-                    track = trackAvailable ? Track.Six : Track.Seven;
+                    track = enterDualTrack(Track.Six, Track.Seven, Switch.B);
                 }
                 break;
             case Six:
             case Seven:
                 if (direction < 0) {
-                    enterSingleTrack(rightBend, track == Track.Six ? overtake : null, Switch.B);
-                    track = Track.Five;
+                    track = enterSingleTrack(Track.Five, Switch.B);
                 } else {
-                    enterSingleTrack(leftBend, track == Track.Six ? overtake : null, Switch.C);
-                    track = Track.Eight;
+                    track = enterSingleTrack(Track.Eight, Switch.C);
                 }
                 break;
             case Eight:
                 if (direction < 0) {
-                    boolean trackAvailable = enterDualTrack(overtake, Switch.C);
-                    track = trackAvailable ? Track.Six : Track.Seven;
+                    track = enterDualTrack(Track.Six, Track.Seven, Switch.C);
                 }
                 else{
-                    boolean trackAvailable = enterDualTrack(bottomStation, Switch.D);
-                    track = trackAvailable ? Track.Nine : Track.Ten;
+                    track = enterDualTrack(Track.Nine, Track.Ten, Switch.D);
                 }
                 break;
             case Nine:
             case Ten:
                 if (direction < 0) {
-                    enterSingleTrack(leftBend, track == Track.Nine ? bottomStation : null, Switch.D);
-                    track = Track.Eight;
+                    track = enterSingleTrack(Track.Eight, Switch.D);
                 } else {
                     stationStop = true;
                 }
                 break;
         }
         startTrain();
-        releaseSensor = true;
     }
 
-    public void enterSingleTrack(Semaphore lockToAcquire, Semaphore lockToRelease, Switch s)
+    public Track enterSingleTrack(Track target, Switch s)
         throws CommandException, InterruptedException
     {
-        lockToAcquire.acquire();
-        if (lockToRelease != null) {
-            // Save for release at next sensor
-            releaseLock = lockToRelease;
-            s.setTrack(Switch.PRIMARY);
-        }
-        else{
-            s.setTrack(Switch.SECONDARY);
-        }
+        monitor.enterTrack(id, target);
+        s.setTrack(track.isPrimary());
+        return target;
+        
     }
 
-    public boolean enterDualTrack(Semaphore lockToAcquire, Switch s) 
-        throws CommandException
+    public Track enterDualTrack(Track primary, Track secondary, Switch s) 
+        throws CommandException, InterruptedException
     {
-        boolean primaryAvailable = lockToAcquire.tryAcquire();
-        s.setTrack(primaryAvailable);
-        return primaryAvailable;
+        if (!monitor.isBusy(primary)) {
+            monitor.enterTrack(id, primary);
+            s.setTrack(primary.isPrimary());
+            System.err.println("Choosing "+primary+" which isPrimary: "+primary.isPrimary());
+            return primary;
+        } else {
+            System.err.println("Choosing "+secondary+" which isPrimary: "+secondary.isPrimary());
+            monitor.enterTrack(id, secondary);
+            s.setTrack(secondary.isPrimary());
+            return secondary;
+        }
     }
 
     public void startTrain() throws CommandException { 
-        tsi.setSpeed(id,speed); 
+        Train.tsi.setSpeed(id,speed); 
     }
     public void stopTrain() throws CommandException { 
-        tsi.setSpeed(id,0); 
+        Train.tsi.setSpeed(id,0); 
     }
 
-    enum Switch{
-        A(17, 7, SWITCH_RIGHT),
-        B(15, 9, SWITCH_RIGHT),
-        C(4,  9, SWITCH_LEFT),
-        D(3, 11, SWITCH_LEFT);
 
-        public static final boolean PRIMARY   = true;
-        public static final boolean SECONDARY = false;
-        
-        private final int x;
-        private final int y;
-        private final int direction;
+}
+enum Switch{
+    A(17, 7, SWITCH_RIGHT),
+    B(15, 9, SWITCH_RIGHT),
+    C(4,  9, SWITCH_LEFT),
+    D(3, 11, SWITCH_LEFT);
 
-        Switch(int x, int y, int direction)
-        {
-            this.x = x;
-            this.y = y;
-            this.direction = direction;
-        }
+    public static final boolean PRIMARY   = true;
+    public static final boolean SECONDARY = false;
 
-        public void setTrack(boolean toPrimary)
-            throws CommandException
-        {
-            if(toPrimary){
-                tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_LEFT : SWITCH_RIGHT);
-            }
-            else{
-                tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_RIGHT : SWITCH_LEFT);
-            }
-        }
+    private final int x;
+    private final int y;
+    private final int direction;
+
+    Switch(int x, int y, int direction)
+    {
+        this.x = x;
+        this.y = y;
+        this.direction = direction;
     }
 
+    public void setTrack(boolean toPrimary)
+        throws CommandException
+    {
+        if(toPrimary){
+            Train.tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_LEFT : SWITCH_RIGHT);
+        }
+        else{
+            Train.tsi.setSwitch(x, y, direction == SWITCH_LEFT ? SWITCH_RIGHT : SWITCH_LEFT);
+        }
+    }
 }
 
 enum Track { 
-    One,Two,Three,Four,Five,Six,Seven,Eight,Nine,Ten
+    One(    Switch.PRIMARY),
+    Two(    Switch.SECONDARY),
+    Three(  Switch.PRIMARY),
+    Four(   Switch.SECONDARY),
+    Five(   Switch.PRIMARY),
+    Six(    Switch.PRIMARY),
+    Seven(  Switch.SECONDARY),
+    Eight(  Switch.PRIMARY),
+    Nine(   Switch.PRIMARY),
+    Ten(    Switch.SECONDARY), 
+    Crossing(Switch.PRIMARY);
+
+    private boolean isPrimary; 
+
+    Track(boolean isPrimary) {
+        this.isPrimary = isPrimary;
+    }
+
+    public boolean isPrimary() {
+        return isPrimary;
+    }
 }
 
 
@@ -331,14 +335,15 @@ class TrackMonitor {
 
         busyTrack.put(Track.One,false);
         busyTrack.put(Track.Two,false);
-        busyTrack.put(Track.Three,false);
+        busyTrack.put(Track.Three,true);
         busyTrack.put(Track.Four,false);
         busyTrack.put(Track.Five,false);
         busyTrack.put(Track.Six,false);
         busyTrack.put(Track.Seven,false);
         busyTrack.put(Track.Eight,false);
-        busyTrack.put(Track.Nine,false);
+        busyTrack.put(Track.Nine,true);
         busyTrack.put(Track.Ten,false);
+        busyTrack.put(Track.Crossing,false);
 
     }
 
@@ -347,12 +352,14 @@ class TrackMonitor {
         
         boolean result = busyTrack.get(t);
 
+        System.err.println("isBusy "+t+ " : " +result);
+
         lock.unlock();
 
         return result;
     }
 
-    public void enterTrack(Track t) 
+    public void enterTrack(int id, Track t) 
         throws InterruptedException 
     {
         lock.lock();
@@ -360,6 +367,7 @@ class TrackMonitor {
         
         while (busyTrack.get(t)) isBusy.await();
 
+        System.err.println(id+" Enter "+t);
         busyTrack.put(t,true);
 
         lock.unlock();
@@ -372,6 +380,7 @@ class TrackMonitor {
         busyTrack.put(t,false);
 
 
+        System.err.println("Leave "+t);
         isBusy.signal();
 
         lock.unlock();
