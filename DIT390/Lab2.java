@@ -125,7 +125,6 @@ class Train extends Thread {
                 startTrain();
                 oldTrack = null;
                 stationStop = false;
-                skipAfterStation = true;
             }
             return;
         }
