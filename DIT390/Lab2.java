@@ -17,6 +17,7 @@ public class Lab2 {
 
     public Lab2(String[] args) {
         TSimInterface tsi = TSimInterface.getInstance();
+        tsi.setDebug(true);
         int speed1 = 10, speed2 = 10;
         int simSpeed = 100;
         
@@ -71,6 +72,7 @@ class Train extends Thread {
     int speed;
     final int simSpeed;
     boolean stationStop = false;
+    boolean stationSkip = true;
 
 
     private final static TrackMonitor monitor = new TrackMonitor();
@@ -113,6 +115,10 @@ class Train extends Thread {
         throws InterruptedException, CommandException 
     {
 
+        if (stationSkip) {
+            stationSkip = false;
+            return;
+        }
         if (e.getStatus() == SensorEvent.INACTIVE) {
             if (stationStop) {
                 stopTrain();
@@ -125,11 +131,12 @@ class Train extends Thread {
                 startTrain();
                 oldTrack = null;
                 stationStop = false;
+                stationSkip = true;
             }
             return;
         }
             
-        if (oldTrack != null) { 
+        if (oldTrack != null && oldTrack != track) { 
             // if (((oldTrack == Track.One || oldTrack == Track.Two) && direction > 0 )
             //     || ((oldTrack == Track.Three || oldTrack == Track.Four) && direction < 0) ) {
             //     monitor.leaveTrack(Track.Crossing);
@@ -141,18 +148,19 @@ class Train extends Thread {
                 case One:
                 case Two:
                     if (direction > 0) {
-                        monitor.leaveTrack(Track.Crossing);
+                        monitor.leaveTrack(id,Track.Crossing);
                     }
                     break;
                 case Three:
                 case Four:
                     if (direction < 0) {
-                        monitor.leaveTrack(Track.Crossing);
+                        monitor.leaveTrack(id, Track.Crossing);
                     } else {
+                        monitor.leaveTrack(id, oldTrack);
                     }
                     break;
                 default:
-                    monitor.leaveTrack(oldTrack);
+                    monitor.leaveTrack(id, oldTrack);
                     break;   
             }
 
@@ -230,13 +238,13 @@ class Train extends Thread {
     public Track enterDualTrack(Track primary, Track secondary, Switch s) 
         throws CommandException, InterruptedException
     {
-        if (!monitor.isBusy(primary)) {
+        if (!monitor.isBusy(id,primary)) {
             monitor.enterTrack(id, primary);
             s.setTrack(primary.isPrimary());
-            System.err.println("Choosing "+primary+" which isPrimary: "+primary.isPrimary());
+            System.err.println("Train " + id + " is choosing "+primary+" which isPrimary: "+primary.isPrimary());
             return primary;
         } else {
-            System.err.println("Choosing "+secondary+" which isPrimary: "+secondary.isPrimary());
+            System.err.println("Train " + id + " is choosing "+secondary+" which isPrimary: "+secondary.isPrimary());
             monitor.enterTrack(id, secondary);
             s.setTrack(secondary.isPrimary());
             return secondary;
@@ -317,17 +325,6 @@ class TrackMonitor {
 
     private final Condition isBusy = lock.newCondition();
 
-    // private boolean oneBusy   = false;
-    // private boolean twoBusy   = false;
-    // private boolean threeBusy = false;
-    // private boolean fourBusy  = false;
-    // private boolean fiveBusy  = false;
-    // private boolean sixBusy   = false;
-    // private boolean sevenBusy = false;
-    // private boolean eightBusy = false;
-    // private boolean nineBusy  = false;
-    // private boolean tenBusy   = false;
-
     private Map<Track,Boolean> busyTrack = new HashMap<>();
 
     public TrackMonitor() {
@@ -346,12 +343,12 @@ class TrackMonitor {
 
     }
 
-    public boolean isBusy(Track t) {
+    public boolean isBusy(int id ,Track t) {
         lock.lock();
         
         boolean result = busyTrack.get(t);
 
-        System.err.println("isBusy "+t+ " : " +result);
+        System.err.println("Train "+id+" checks isBusy for "+t+". Result: " +result);
 
         lock.unlock();
 
@@ -366,20 +363,20 @@ class TrackMonitor {
         
         while (busyTrack.get(t)) isBusy.await();
 
-        System.err.println(id+" Enter "+t);
+        System.err.println("Train "+id+" entered "+t);
         busyTrack.put(t,true);
 
         lock.unlock();
     }
 
-    public void leaveTrack(Track t) {
+    public void leaveTrack(int id, Track t) {
         lock.lock();
 
         
         busyTrack.put(t,false);
 
 
-        System.err.println("Leave "+t);
+        System.err.println("Train "+id+" left "+t);
         isBusy.signal();
 
         lock.unlock();
