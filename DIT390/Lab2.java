@@ -308,8 +308,9 @@ class TrackMonitor {
 
     private final Map<Track,Boolean> busyTrack = new HashMap<>();
 
+    // We have 11 condition variables in a map, each signifying a critical 
+    // section of track. This is to prevent two trains on each critical section.
     public TrackMonitor() {
-
         busyTrack.put(Track.One,false);
         busyTrack.put(Track.Two,false);
         busyTrack.put(Track.Three,true);
@@ -321,9 +322,9 @@ class TrackMonitor {
         busyTrack.put(Track.Nine,true);
         busyTrack.put(Track.Ten,false);
         busyTrack.put(Track.Crossing,false);
-
     }
 
+    // Used to check if a track is allready busy
     public boolean isBusy(int id ,Track t) {
         lock.lock();        
         boolean result = busyTrack.get(t);
@@ -331,6 +332,7 @@ class TrackMonitor {
         return result;
     }
 
+    // Attempts to enter a track and blocks if its busy
     public void enterTrack(int id, Track t) 
         throws InterruptedException 
     {
@@ -340,6 +342,7 @@ class TrackMonitor {
         lock.unlock();
     }
 
+    // Leases a track, i.e. changes the condition for the track to available
     public void leaveTrack(int id, Track t) {
         lock.lock();
         busyTrack.put(t,false);
