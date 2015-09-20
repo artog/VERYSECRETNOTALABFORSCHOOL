@@ -56,6 +56,7 @@ public class Lab2 {
 
 class Train extends Thread {   
     public static final TSimInterface tsi = TSimInterface.getInstance();
+    private final static TrackMonitor monitor = new TrackMonitor();
          
     // Train Id enum
     final int TOP_TRAIN = 1;
@@ -74,15 +75,10 @@ class Train extends Thread {
     boolean stationStop = false;
     boolean stationSkip = true;
 
-
-    private final static TrackMonitor monitor = new TrackMonitor();
-
-
     public Train(int speed, int id, int simSpeed) {
         this.simSpeed = simSpeed;
         this.id = id;
         this.speed = speed;
-
 
         if (id == TOP_TRAIN) {   
             track = Track.One;
@@ -137,13 +133,6 @@ class Train extends Thread {
         }
             
         if (oldTrack != null && oldTrack != track) { 
-            // if (((oldTrack == Track.One || oldTrack == Track.Two) && direction > 0 )
-            //     || ((oldTrack == Track.Three || oldTrack == Track.Four) && direction < 0) ) {
-            //     monitor.leaveTrack(Track.Crossing);
-            // } else {
-            //     monitor.leaveTrack(oldTrack);
-            // }
-
             switch (oldTrack) {
                 case One:
                 case Two:
@@ -163,8 +152,6 @@ class Train extends Thread {
                     monitor.leaveTrack(id, oldTrack);
                     break;   
             }
-
-
             oldTrack = null;
             return; 
         }
@@ -241,10 +228,8 @@ class Train extends Thread {
         if (!monitor.isBusy(id,primary)) {
             monitor.enterTrack(id, primary);
             s.setTrack(primary.isPrimary());
-            System.err.println("Train " + id + " is choosing "+primary+" which isPrimary: "+primary.isPrimary());
             return primary;
         } else {
-            System.err.println("Train " + id + " is choosing "+secondary+" which isPrimary: "+secondary.isPrimary());
             monitor.enterTrack(id, secondary);
             s.setTrack(secondary.isPrimary());
             return secondary;
@@ -316,16 +301,12 @@ enum Track {
     }
 }
 
-
-
 class TrackMonitor {
 
     private final Lock lock = new ReentrantLock();
-
-
     private final Condition isBusy = lock.newCondition();
 
-    private Map<Track,Boolean> busyTrack = new HashMap<>();
+    private final Map<Track,Boolean> busyTrack = new HashMap<>();
 
     public TrackMonitor() {
 
@@ -344,42 +325,25 @@ class TrackMonitor {
     }
 
     public boolean isBusy(int id ,Track t) {
-        lock.lock();
-        
+        lock.lock();        
         boolean result = busyTrack.get(t);
-
-        System.err.println("Train "+id+" checks isBusy for "+t+". Result: " +result);
-
         lock.unlock();
-
         return result;
     }
 
     public void enterTrack(int id, Track t) 
         throws InterruptedException 
     {
-        lock.lock();
-
-        
+        lock.lock();        
         while (busyTrack.get(t)) isBusy.await();
-
-        System.err.println("Train "+id+" entered "+t);
         busyTrack.put(t,true);
-
         lock.unlock();
     }
 
     public void leaveTrack(int id, Track t) {
         lock.lock();
-
-        
         busyTrack.put(t,false);
-
-
-        System.err.println("Train "+id+" left "+t);
         isBusy.signal();
-
         lock.unlock();
     }
-
 }
