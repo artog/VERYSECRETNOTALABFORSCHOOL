@@ -304,6 +304,11 @@ class Train extends Thread {
 
 
 class TrackMonitor {
+
+    // This monitor uses one condition variable to denote if the track is busy.
+    // We have one monitor per critical section, see line 56, which means a total of 
+    // six condition variables for the whole program.
+
     private final Lock lock = new ReentrantLock();
     private final Condition isBusy = lock.newCondition();
 
@@ -313,6 +318,7 @@ class TrackMonitor {
         busyTrack = initState;
     }
 
+    // Attempts to enter a track. If its available sets it as busy.
     public boolean tryEnter() {
         boolean result = false;
         lock.lock();  
@@ -321,11 +327,12 @@ class TrackMonitor {
             busyTrack = true;
             result = true;
         }
-        
+
         lock.unlock();
         return result;
     }
 
+    // Attempts to enter a track and blocks if its busy
     public void enter() 
         throws InterruptedException 
     {
@@ -335,6 +342,7 @@ class TrackMonitor {
         lock.unlock();
     }
 
+    // Leases a track, i.e. changes the condition for the track to available
     public void leave() {
         lock.lock();
         busyTrack = false;;
