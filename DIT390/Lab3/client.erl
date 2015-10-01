@@ -4,7 +4,7 @@
 
 %% Produce initial state
 initial_state(Nick, GUIName) ->
-    #client_st { gui = GUIName }.
+    #client_st { gui = GUIName, name = Nick }.
 
 %% ---------------------------------------------------------------------------
 
@@ -32,18 +32,48 @@ loop(St, {leave, Channel}) ->
 
 % Sending messages
 loop(St, {msg_from_GUI, Channel, Msg}) ->
+    case St#client_st.server of
+        not_connected   -> {{error,not_connected,"Not connected to a server"},St};
+        Server          -> 
+            case catch(gen_server:request(Server, {St#client_st.name, Channel, Msg})) of
+                {"EXIT","Timeout"} -> {{error,timeout,"Request timed out"}, St};
+                {"EXIT",Reason}    -> {{error,error,Reason}, St};
+                ok                 -> {ok,St}
+            end
+    end;
     % {ok, St} ;
-    {{error, not_implemented, "Not implemented"}, St} ;
+    % {{error, not_implemented, "Not implemented"}, St} ;
 
 %% Get current nick
 loop(St, whoami) ->
+    case St#client_st.server of
+        not_connected   -> {{error,not_connected,"Not connected to a server"},St};
+        Server          -> 
+            case catch(gen_server:request(Server, whoami)) of
+                {"EXIT","Timeout"}  -> {{error,timeout,"Request timed out"}, St};
+                {"EXIT",Reason}     -> {{error,error,Reason}, St};
+                {nick,Nick}         -> {Nick,St}
+            end
+    end;
+
+            
+
     % {"nick", St} ;
-    {{error, not_implemented, "Not implemented"}, St} ;
+    % {{error, not_implemented, "Not implemented"}, St} ;
 
 %% Change nick
 loop(St, {nick, Nick}) ->
+    case St#client_st.server of
+        not_connected   -> {{error,not_connected,"Not connected to a server"},St};
+        Server          -> 
+            case catch(gen_server:request(Server, {nick, Nick})) of
+                {"EXIT","Timeout"}  -> {{error,timeout,"Request timed out"}, St};
+                {"EXIT",Reason}     -> {{error,error,Reason}, St};
+                {nick,Nick}         -> {ok,St#client_st{name=Nick}}
+            end
+    end;
     % {ok, St} ;
-    {{error, not_implemented, "Not implemented"}, St} ;
+    % {{error, not_implemented, "Not implemented"}, St} ;
 
 %% Incoming message
 loop(St = #client_st { gui = GUIName }, {incoming_msg, Channel, Name, Msg}) ->
