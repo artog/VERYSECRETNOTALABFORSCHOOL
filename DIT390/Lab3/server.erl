@@ -18,16 +18,24 @@ loop(St, Message) ->
         
         %% Connect, no shit?
         {connect, Name, Pid} ->
-            case lists:member(Name, Clients) of
-                false -> {ok, St#server_st{clients=[#user{name=Name,pid=Pid}|Clients]}};
-                true  -> {user_already_connected, St}
+            User = find_user_by_name(Name,Clients),
+            case User of
+                error -> {ok, St#server_st{clients=[#user{name=Name,pid=Pid}|Clients]}};
+                _  -> 
+                    case User#user.pid of
+                        Pid -> {user_already_connected, St};
+                        _   -> {name_taken, St}
+                    end
             end;
         
         %% Disconnect, duh
         {disconnect, Name} ->
-            case lists:member(Name, Clients) of
-                false -> {user_not_connected, St};
-                true  -> {ok, St#server_st{clients=lists:delete(Name, Clients)}}
+            case find_user_by_name(Name, Clients) of
+                error -> {user_not_connected, St};
+                User  -> 
+                    NewClients = lists:delete(User, Clients),
+                    io:format("Users left: ~p~n",[NewClients]),
+                    {ok, St#server_st{clients=NewClients}}
             end;
 
         %% Request to change name
@@ -35,11 +43,11 @@ loop(St, Message) ->
             case user_exists(Name, Clients) of
                 false -> 
                     User = find_user_by_pid(Pid, Clients),
-                    io:format("User: ~p~n", [User]),
+                    NewClients = lists:delete(User,Clients),
                     {ok, St#server_st{
-                        clients = [ User#user{name = Name} | Clients]
+                        clients = [ User#user{name = Name} | NewClients]
                     }};
-                true -> exit("Name is already taken")
+                true -> {{"EXIT","Name is already taken"},St}
             end;
 
         %% Returns the name onnected to the pid sending

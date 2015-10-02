@@ -16,7 +16,8 @@ loop(St, {connect, Server}) ->
     case genserver:request(list_to_atom(Server), {connect, St#client_st.name, self()}) of
         ok -> {ok, St#client_st{server=list_to_atom(Server)}};
         user_already_connected -> {{error, user_already_connected, "You are already connected."}, St};
-        server_not_reached -> {{error, server_not_reached, "Server couldn't be reached."}, St}
+        server_not_reached -> {{error, server_not_reached, "Server couldn't be reached."}, St};
+        name_taken         -> {{error, user_already_connected, "Your name is already taken."}, St}
     end;
 
 %% Disconnect from server
@@ -61,7 +62,7 @@ loop(St, {msg_from_GUI, Channel, Msg}) ->
 %% Get current nick
 loop(St, whoami) ->
     case St#client_st.server of
-        not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
+        not_connected   -> {St#client_st.name, St};
         Server          -> 
             case catch(genserver:request(Server, {whoami, self()})) of
                 {"EXIT","Timeout"}  -> {{error,timeout,"Request timed out"}, St};
@@ -74,7 +75,7 @@ loop(St, whoami) ->
 %% Change nick
 loop(St, {nick, Nick}) ->
     case St#client_st.server of
-        not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
+        not_connected   -> {ok,St#client_st{name=Nick}};
         Server          -> 
             case catch(genserver:request(Server, {nick, Nick, self()})) of
                 {"EXIT","Timeout"}  -> {{error,timeout,"Request timed out"}, St};
