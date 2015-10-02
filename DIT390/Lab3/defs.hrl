@@ -7,8 +7,9 @@
 % This record defines the structure of the server process.
 % Add whatever other fields you need.
 -record(server_st, {
-	users = [],
+	clients = [],
+    channels = [],
 	name
 }).
 
--record(user, {pid, nick}).
+-record(user, {pid, name}).
