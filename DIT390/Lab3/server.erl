@@ -25,9 +25,9 @@ loop(St, Message) ->
         
         %% Disconnect, duh
         {disconnect, Name} ->
-            case lists:member(Name, Clients) of
+            case lists:keymember(Name, 3, Clients) of
                 false -> {user_not_connected, St};
-                true  -> {ok, St#server_st{clients=lists:delete(Name, Clients)}}
+                true  -> {ok, St#server_st{clients=lists:keydelete(Name, 3, Clients)}}
             end;
 
         %% Request to change name
