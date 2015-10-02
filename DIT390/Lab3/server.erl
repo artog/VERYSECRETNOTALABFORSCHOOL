@@ -30,12 +30,9 @@ loop(St, Message) ->
         
         %% Disconnect, duh
         {disconnect, Name} ->
-            case find_user_by_name(Name, Clients) of
-                error -> {user_not_connected, St};
-                User  -> 
-                    NewClients = lists:delete(User, Clients),
-                    io:format("Users left: ~p~n",[NewClients]),
-                    {ok, St#server_st{clients=NewClients}}
+            case lists:keymember(Name, 3, Clients) of
+                false -> {user_not_connected, St};
+                true  -> {ok, St#server_st{clients=lists:keydelete(Name, 3, Clients)}}
             end;
 
         %% Request to change name
