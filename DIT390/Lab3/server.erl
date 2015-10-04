@@ -33,7 +33,9 @@ loop(St, Message) ->
             case lists:keymember(Name, 3, Clients) of
                 false -> {user_not_connected, St};
                 true  -> 
-                    case lists:any(fun(X) -> X =:= true end, lists:map(fun(C) -> lists:member(Name, C#channel.clients) end, Channels)) of
+                    User = find_user_by_name(Name, Clients),
+                    Pid = User#user.pid,
+                    case lists:any(fun(X) -> X =:= true end, lists:map(fun(C) -> lists:member(Pid, C#channel.clients) end, Channels)) of
                         false -> {ok, St#server_st{clients=lists:keydelete(Name, 3, Clients)}};
                         true  -> {leave_channels_first, St}
                     end
@@ -109,7 +111,9 @@ loop(St, Message) ->
 %%  Helpers
 
 send_message(Pid, Channel, Name, Msg) ->
-    genserver:requestAsync(Pid,{incoming_msg, Channel, Name, Msg}).
+    Data = {incoming_msg, Channel, Name, Msg},
+    Ref = make_ref(),  
+    Pid ! {request, self(), Ref, Data}.
 
 
 find_user_by_name(Name, [User | Users]) ->
