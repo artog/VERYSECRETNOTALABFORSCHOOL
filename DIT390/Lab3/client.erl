@@ -12,7 +12,6 @@ initial_state(Nick, GUIName) ->
 
 %% Connect to server
 loop(St, {connect, Server}) ->
-    io:format("Client:connect"),
     case genserver:request(list_to_atom(Server), {connect, St#client_st.name, self()}) of
         ok -> {ok, St#client_st{server=list_to_atom(Server)}};
         user_already_connected -> {{error, user_already_connected, "You are already connected."}, St};
@@ -38,7 +37,7 @@ loop(St, {join, Channel}) ->
     case St#client_st.server of
         not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
         Server          -> 
-            case genserver:request(Server, {join, Channel, St#client_st.name}) of
+            case genserver:request(Server, {join, Channel, self()}) of
                 ok -> {ok, St#client_st{channels=[Channel|St#client_st.channels]}};
                 user_already_joined -> {{error, user_already_joined, "You have already joined that channel."}, St}
             end
@@ -49,7 +48,7 @@ loop(St, {leave, Channel}) ->
     case St#client_st.server of
             not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
             Server          -> 
-                case genserver:request(Server, {leave, Channel, St#client_st.name}) of
+                case genserver:request(Server, {leave, Channel, self()}) of
                     ok -> {ok, St#client_st{channels=undefined}};
                     user_not_joined -> {{error, user_not_joined, "You havn't joined that channel."}, St}
             end
@@ -60,10 +59,12 @@ loop(St, {msg_from_GUI, Channel, Msg}) ->
     case St#client_st.server of
         not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
         Server          -> 
-            case catch(genserver:request(Server, {send_message, St#client_st.name, Channel, Msg})) of
-                {"EXIT","Timeout"} -> {{error,timeout,"Request timed out"}, St};
-                {"EXIT",Reason}    -> {{error,error,Reason}, St};
-                ok                 -> {ok,St}
+            case catch(genserver:request(Server, {send_message, self(), Channel, Msg})) of
+                ok                 -> {ok,St};
+                unkown_channel     -> {{error, user_not_joined,"The channel does not exist."}, St};
+                user_not_joined    -> {{error, user_not_joined,"You are not a member of that channel"}, St};
+                {"EXIT","Timeout"} -> {{error, timeout,         "Request timed out"}, St};
+                {"EXIT",Reason}    -> {{error, error,           Reason}, St}
             end
     end;
 
@@ -86,11 +87,14 @@ loop(St, {nick, Nick}) ->
         not_connected   -> {ok,St#client_st{name=Nick}};
         Server          -> 
             case catch(genserver:request(Server, {nick, Nick, self()})) of
+                ok                  -> {ok,St#client_st{name=Nick}};
+                nick_taken          -> {{error,nick_taken,"That nick is already taken"}, St};
                 {"EXIT","Timeout"}  -> {{error,timeout,"Request timed out"}, St};
-                {"EXIT",Reason}     -> {{error,error,Reason}, St};
-                ok         -> {ok,St#client_st{name=Nick}}
+                {"EXIT",Reason}     -> {{error,error,Reason}, St}
             end
     end;
+
+
 
 %% Incoming message
 loop(St = #client_st { gui = GUIName }, {incoming_msg, Channel, Name, Msg}) ->

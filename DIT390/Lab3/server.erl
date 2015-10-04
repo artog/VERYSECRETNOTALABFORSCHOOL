@@ -13,7 +13,7 @@ initial_state(ServerName) ->
 loop(St, Message) ->
     Clients  = St#server_st.clients,
     Channels = St#server_st.channels,
-    io:format("Got message: ~p~n",[Message]),
+    % io:format("Got message: ~p~n",[Message]),
     case Message of
         
         %% Connect, no shit?
@@ -68,7 +68,7 @@ loop(St, Message) ->
                     {ok, St#server_st{
                         clients = [ User#user{name = Name} | NewClients]
                     }};
-                true -> {{"EXIT","Name is already taken"},St}
+                true -> {nick_taken,St}
             end;
 
         %% Returns the name onnected to the pid sending
@@ -77,6 +77,29 @@ loop(St, Message) ->
                 error -> exit(user_not_found);
                 User  -> {{nick, User#user.name },St}
             end;
+
+
+        {send_message, SenderPid, Channel, Msg} ->
+            Sender = find_user_by_pid(SenderPid, Clients),
+            SenderName = Sender#user.name,
+            case lists:keyfind(Channel, 2, Channels) of
+                false -> {unkown_channel, St};
+                C     ->
+                    case lists:member(SenderPid, C#channel.clients) of
+                        false -> {user_not_joined, St};
+                        true  -> 
+                            ChanRecord = lists:keyfind(Channel,2, Channels),
+                            Pids = ChanRecord#channel.clients,
+                            lists:foreach(fun(Pid) -> 
+                                % User = find_user_by_pid(Pid, Clients),
+                                case Pid of 
+                                    SenderPid -> true;
+                                    _          -> send_message(Pid, Channel, SenderName, Msg)
+                                end
+                            end, Pids),
+                            {ok,St}
+                    end
+            end;
         _            -> {not_implemented,St}
     end.
 
@@ -84,6 +107,10 @@ loop(St, Message) ->
 
 %% ---------------------------------------------------------------------------
 %%  Helpers
+
+send_message(Pid, Channel, Name, Msg) ->
+    genserver:requestAsync(Pid,{incoming_msg, Channel, Name, Msg}).
+
 
 find_user_by_name(Name, [User | Users]) ->
     case User#user.name of
@@ -104,7 +131,6 @@ user_exists(_ , []) ->
 
 
 find_user_by_pid(Pid, [User | Users]) ->
-    io:format("Finding ~p among ~p~n",[Pid,[User | Users]]),
     case User#user.pid of
         Pid -> User;
         _   -> find_user_by_pid(Pid, Users)
