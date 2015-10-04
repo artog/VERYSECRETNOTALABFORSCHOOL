@@ -43,10 +43,11 @@ loop(St, Message) ->
 
         {join, Channel, Client} ->
             case lists:keyfind(Channel, 2, Channels) of
-                false -> {ok, St#server_st{channels=[#channel{name=Channel, clients=[Client]}|Channels]}};
+                false -> Pid = spawn(fun channel_loop/0),
+                         {{ok, Pid}, St#server_st{channels=[#channel{name=Channel, clients=[Client], pid=Pid}|Channels]}};
                 C     -> 
                     case lists:member(Client, C#channel.clients) of
-                        false -> {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=[Client|C#channel.clients]})}};
+                        false -> {{ok, C#channel.pid}, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=[Client|C#channel.clients]})}};
                         true  -> {user_already_joined, St}
                     end
             end;
@@ -142,3 +143,9 @@ find_user_by_pid(Pid, [User | Users]) ->
 
 find_user_by_pid(_, []) ->
     error.
+
+channel_loop() ->
+    receive
+        Msg -> not_implemented
+    end,
+    channel_loop().

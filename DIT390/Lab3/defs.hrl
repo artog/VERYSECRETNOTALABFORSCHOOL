@@ -14,4 +14,4 @@
 
 -record(user, {pid, name}).
 
--record(channel, {name, clients}).
+-record(channel, {name, clients, pid}).
