@@ -12,11 +12,12 @@ initial_state(Nick, GUIName) ->
 
 %% Connect to server
 loop(St, {connect, Server}) ->
-    case genserver:request(list_to_atom(Server), {connect, St#client_st.name, self()}) of
+    case catch(genserver:request(list_to_atom(Server), {connect, St#client_st.name, self()})) of
         ok -> {ok, St#client_st{server=list_to_atom(Server)}};
         user_already_connected -> {{error, user_already_connected, "You are already connected."}, St};
-        server_not_reached -> {{error, server_not_reached, "Server couldn't be reached."}, St};
-        name_taken         -> {{error, user_already_connected, "Your name is already taken."}, St}
+        server_not_reached     -> {{error, server_not_reached, "Server couldn't be reached."}, St};
+        name_taken             -> {{error, user_already_connected, "Your name is already taken."}, St};
+        {'EXIT', {badarg, _}}  -> {{error, server_not_reached, "Server couldn't be reached."}, St}
     end;
 
 %% Disconnect from server
