@@ -35,16 +35,24 @@ loop(St, disconnect) ->
 
 % Join channel
 loop(St, {join, Channel}) ->
-    case genserver:request(St#client_st.server, {join, St#client_st.name}) of
-        ok -> {ok, St#client_st{channel=Channel}};
-        user_already_joined -> {error, user_already_joined, "User already joined."}
+    case St#client_st.server of
+        not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
+        Server          -> 
+            case genserver:request(Server, {join, Channel, St#client_st.name}) of
+                ok -> {ok, St#client_st{channels=[Channel|St#client_st.channels]}};
+                user_already_joined -> {{error, user_already_joined, "You have already joined that channel."}, St}
+            end
     end;
 
 %% Leave channel
 loop(St, {leave, Channel}) ->
-    case genserver:request(St#client_st.server, {leave, St#client_st.name}) of
-        ok -> {ok, St#client_st{channel=undefined}};
-        user_not_joined -> {error, user_not_joined, "User havn't joined channel."}
+    case St#client_st.server of
+            not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
+            Server          -> 
+                case genserver:request(Server, {leave, Channel, St#client_st.name}) of
+                    ok -> {ok, St#client_st{channels=undefined}};
+                    user_not_joined -> {{error, user_not_joined, "You havn't joined that channel."}, St}
+            end
     end;
 
 % Sending messages

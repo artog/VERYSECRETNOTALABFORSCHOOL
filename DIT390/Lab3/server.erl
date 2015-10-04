@@ -32,7 +32,31 @@ loop(St, Message) ->
         {disconnect, Name} ->
             case lists:keymember(Name, 3, Clients) of
                 false -> {user_not_connected, St};
-                true  -> {ok, St#server_st{clients=lists:keydelete(Name, 3, Clients)}}
+                true  -> 
+                    case lists:any(fun(X) -> X =:= true end, lists:map(fun(C) -> lists:member(Name, C#channel.clients) end, Channels)) of
+                        false -> {ok, St#server_st{clients=lists:keydelete(Name, 3, Clients)}};
+                        true  -> {leave_channels_first, St}
+                    end
+            end;
+
+        {join, Channel, Client} ->
+            case lists:keyfind(Channel, 2, Channels) of
+                false -> {ok, St#server_st{channels=[#channel{name=Channel, clients=[Client]}|Channels]}};
+                C     -> 
+                    case lists:member(Client, C#channel.clients) of
+                        false -> {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=[Client|C#channel.clients]})}};
+                        true  -> {user_already_joined, St}
+                    end
+            end;
+
+        {leave, Channel, Client} ->
+            case lists:keyfind(Channel, 2, Channels) of
+                false -> {user_not_joined, St};
+                C     ->
+                    case lists:member(Client, C#channel.clients) of
+                        false -> {user_not_joined, St};
+                        true  -> {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=lists:delete(Client, C#channel.clients)})}}
+                    end
             end;
 
         %% Request to change name
