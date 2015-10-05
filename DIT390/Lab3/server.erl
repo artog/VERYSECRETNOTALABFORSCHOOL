@@ -13,7 +13,7 @@ initial_state(ServerName) ->
 loop(St, Message) ->
     Clients  = St#server_st.clients,
     Channels = St#server_st.channels,
-    % io:format("Got message: ~p~n",[Message]),
+    io:format("Got message: ~p~n",[Message]),
     case Message of
         
         %% Connect, no shit?
@@ -43,10 +43,32 @@ loop(St, Message) ->
 
         {join, Channel, Client} ->
             case lists:keyfind(Channel, 2, Channels) of
-                false -> {ok, St#server_st{channels=[#channel{name=Channel, clients=[Client]}|Channels]}};
+                false -> 
+                    User = find_user_by_pid(Client, Clients),
+                    io:format("New channel ~p with user ~p:~p~n",[Channel,Client, User]),
+                    Pid = genserver:start(
+                        list_to_atom(Channel), 
+                        #channel{
+                            name=Channel,
+                            clients=[User#user.pid]
+                        }, 
+                        fun channel_loop/2
+                    ),
+                    {{ok,Pid}, St#server_st{
+                        channels=[#channel{
+                            name=Channel, 
+                            clients=[Client], 
+                            pid = Pid
+                        } | Channels]
+                    }};
                 C     -> 
                     case lists:member(Client, C#channel.clients) of
-                        false -> {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=[Client|C#channel.clients]})}};
+                        false ->
+                            NewClients =  [Client|C#channel.clients],
+                            io:format("~p now have clients ~p~n",[C#channel.name, NewClients]),
+                            Ref = make_ref(),
+                            C#channel.pid ! {request, self(), Ref, {update_clients, NewClients}},
+                            {{ok,C#channel.pid}, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=NewClients})}};
                         true  -> {user_already_joined, St}
                     end
             end;
@@ -57,7 +79,12 @@ loop(St, Message) ->
                 C     ->
                     case lists:member(Client, C#channel.clients) of
                         false -> {user_not_joined, St};
-                        true  -> {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=lists:delete(Client, C#channel.clients)})}}
+                        true  -> 
+                            NewClients =  lists:delete(Client, C#channel.clients),
+                            Ref = make_ref(),
+                            C#channel.pid ! {request, self(), Ref, {update_clients, NewClients}},
+                            
+                            {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=NewClients})}}
                     end
             end;
 
@@ -105,7 +132,23 @@ loop(St, Message) ->
         _            -> {not_implemented,St}
     end.
 
+%% ---------------------------------------------------------------------------
+%% Channel loop
 
+channel_loop(St, {send_message, Sender, Msg}) ->
+    Channel = St#channel.name, 
+    io:format("~p sends ~p to ~p~n",[Sender#user.pid,Msg,St#channel.clients]),
+    lists:foreach(fun(Pid) -> 
+        case Sender#user.pid of 
+            Pid -> true;
+            _               -> send_message(Pid, Channel, Sender#user.name, Msg)
+        end
+    end, St#channel.clients),
+    {ok,St};
+
+channel_loop(St, {update_clients, NewList}) ->
+    io:format("Got new client list:  ~p~n",[NewList]),
+    {ok, St#channel{clients=NewList}}.
 
 %% ---------------------------------------------------------------------------
 %%  Helpers

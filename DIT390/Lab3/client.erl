@@ -4,7 +4,7 @@
 
 %% Produce initial state
 initial_state(Nick, GUIName) ->
-    #client_st { gui = GUIName, name = Nick }.
+    #client_st { gui = GUIName, name = Nick, channels=[] }.
 
 %% ---------------------------------------------------------------------------
 
@@ -39,8 +39,22 @@ loop(St, {join, Channel}) ->
         not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
         Server          -> 
             case genserver:request(Server, {join, Channel, self()}) of
-                ok -> {ok, St#client_st{channels=[Channel|St#client_st.channels]}};
-                user_already_joined -> {{error, user_already_joined, "You have already joined that channel."}, St}
+                {ok, Pid} -> {
+                    ok, 
+                    St#client_st{
+                        channels=[
+                            #channel{
+                                name = Channel,
+                                pid = Pid
+                            } | St#client_st.channels
+                        ]
+                    }
+                };
+                user_already_joined -> {{
+                    error, 
+                    user_already_joined, 
+                    "You have already joined that channel."
+                }, St}
             end
     end;
 
@@ -50,24 +64,31 @@ loop(St, {leave, Channel}) ->
             not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
             Server          -> 
                 case genserver:request(Server, {leave, Channel, self()}) of
-                    ok -> {ok, St#client_st{channels=undefined}};
+                    ok -> {
+                        ok, 
+                        St#client_st{
+                            channels=lists:keydelete(Channel,3 ,St#client_st.channels)
+                        }
+                    };
                     user_not_joined -> {{error, user_not_joined, "You havn't joined that channel."}, St}
             end
     end;
 
 % Sending messages
 loop(St, {msg_from_GUI, Channel, Msg}) ->
-    case St#client_st.server of
-        not_connected   -> {{error,user_not_connected,"Not connected to a server"},St};
-        Server          -> 
-            case catch(genserver:request(Server, {send_message, self(), Channel, Msg})) of
+    case lists:keyfind(Channel, 2, St#client_st.channels) of
+        false -> {{error, user_not_joined, "You are not in that channel."}, St};
+        Chan  -> 
+            ChanPid = Chan#channel.pid,
+            case catch(genserver:request(ChanPid, {send_message, #user{name=St#client_st.name,pid=self()}, Msg})) of
                 ok                 -> {ok,St};
-                unkown_channel     -> {{error, user_not_joined,"The channel does not exist."}, St};
-                user_not_joined    -> {{error, user_not_joined,"You are not a member of that channel"}, St};
-                {"EXIT","Timeout"} -> {{error, timeout,         "Request timed out"}, St};
-                {"EXIT",Reason}    -> {{error, error,           Reason}, St}
+                {"EXIT","Timeout"} -> {{error, timeout, "Request timed out"}, St};
+                {"EXIT",Reason}    -> {{error, error, Reason}, St}
             end
     end;
+
+
+
 
 %% Get current nick
 loop(St, whoami) ->
