@@ -28,8 +28,7 @@ loop(St, disconnect) ->
             case genserver:request(Server, {disconnect, St#client_st.name}) of
                 ok -> {ok, St#client_st{server=not_connected}};
                 user_not_connected -> {{error, user_not_connected, "You are not connected."}, St};
-                leave_channels_first -> {{error, leave_channels_first, "Leave channels first."}, St};
-                server_not_reached -> {{error, server_not_reached, "Server couldn't be reached."}, St}
+                leave_channels_first -> {{error, leave_channels_first, "Leave channels first."}, St}
             end
     end;
 
