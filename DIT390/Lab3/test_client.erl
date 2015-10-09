@@ -211,7 +211,7 @@ receive_message(Channel, Nick, Message) ->
             assert("channel matches", From, Channel),
             assert("message matches", Msg, Nick++"> "++Message)
     after
-        500 ->
+        5000 ->
             putStrLn(red("nothing received")),
             ?assert(false)
     end.
@@ -223,7 +223,7 @@ no_more_messages() ->
             putStrLn(red("there are unreceived messages")),
             ?assert(false)
     after
-        500 ->
+        1000 ->
             assert("no more messages", true)
     end.
 
@@ -414,13 +414,24 @@ ping() ->
 
 % --- Bad unit tests ---------------------------------------------------------
 
-% Connecting to incorrect server
-connect_wrong_server_test() ->
-    init("connect_wrong_server"),
+% Connecting to non-existent server
+connect_nonexistent_server_test() ->
+    init("connect_nonexistent_server"),
     putStrLn("Wait a few seconds for timeout..."),
     {_Pid, _Nick, ClientAtom} = new_client(),
     Result = request(ClientAtom, {connect, "mordor"}),
     assert_error("connecting to server mordor", Result, server_not_reached).
+
+% Connecting to non-responding server
+connect_nonresponding_server_test() ->
+    Name = "connect_nonresponding_server",
+    putStrLn(blue("\n# Test: "++Name)),
+    Pid = genserver:start(?SERVERATOM, {}, fun (St, _Msg) -> timer:sleep(100000), {dead, St} end), %% blocking server
+    assert("server startup", is_pid(Pid)),
+    putStrLn("Wait a few seconds for timeout..."),
+    {_Pid, _Nick, ClientAtom} = new_client(),
+    Result = request(ClientAtom, {connect, ?SERVER}),
+    assert_error("connecting to non-responsive server", Result, server_not_reached).
 
 % Logging in with a name that is taken
 connect_registered_nick_test() ->
@@ -522,7 +533,7 @@ robustness_channel_test_() ->
 % u1 u2 u3  u4 u5 u6  u7 u8 u9
 robustness_channel() ->
   NRecvs = ?CONC_1_CHANS * ?CONC_1_USERS * (?CONC_1_USERS - 1) * ?CONC_1_MSGS, % sent to clients
-  random:seed(erlang:now()),
+  random:seed(os:timestamp()),
   SleepCount = random:uniform(NRecvs div 4), % how many will sleep
   SleepNs = lists:usort([random:uniform(NRecvs) || _ <- lists:seq(1, SleepCount)]),
 
@@ -784,14 +795,14 @@ many_users_one_channel() ->
                         GUIName = "gui_perf1_"++Is,
                         new_gui(GUIName),
                         genserver:start(ClientAtom, client:initial_state(Nick, GUIName), fun client:loop/2),
-                        T1 = now(),
+                        T1 = os:timestamp(),
                         connect(ClientAtom),
                         join_channel(ClientAtom, Channel),
                         send_message(ClientAtom, Channel, "message_"++Is++"_1"),
                         send_message(ClientAtom, Channel, "message_"++Is++"_2"),
                         leave_channel(ClientAtom, Channel),
                         disconnect(ClientAtom),
-                        T2 = now(),
+                        T2 = os:timestamp(),
                         ParentPid ! {ready, timer:now_diff(T2, T1)}
                     catch Ex ->
                         ParentPid ! {failed, Ex}
@@ -833,7 +844,7 @@ many_users_many_channels() ->
                         GUIName = "gui_perf2_"++Is,
                         new_gui(GUIName),
                         genserver:start(ClientAtom, client:initial_state(Nick, GUIName), fun client:loop/2),
-                        T1 = now(),
+                        T1 = os:timestamp(),
                         connect(ClientAtom),
                         G = fun(Ch_Ix) ->
                                     Ch_Ixs = lists:flatten(io_lib:format("~p", [Ch_Ix])),
@@ -849,7 +860,7 @@ many_users_many_channels() ->
                             end,
                         lists:foreach(G, ChansSeq),
                         disconnect(ClientAtom),
-                        T2 = now(),
+                        T2 = os:timestamp(),
                         ParentPid ! {ready, timer:now_diff(T2, T1)}
                     catch Ex ->
                         ParentPid ! {failed, Ex}

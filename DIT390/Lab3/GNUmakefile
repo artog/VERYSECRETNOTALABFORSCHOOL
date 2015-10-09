@@ -12,7 +12,8 @@ run_ping_tests: all
 	erl +P 1000000 -noshell -eval "eunit:test({test,test_client,ping}), halt()"
 
 run_robustness_tests: all
-	erl +P 1000000 -noshell -eval "eunit:test({timeout, 10, {test,test_client,robustness}}), halt()"
+	erl +P 1000000 -noshell -eval "eunit:test({timeout, 10, {test,test_client,robustness_channel}}), halt()"
+	erl +P 1000000 -noshell -eval "eunit:test({timeout, 10, {test,test_client,robustness_server}}), halt()"
 
 run_concurrency_tests: all
 	erl +P 1000000 -noshell -eval "eunit:test({timeout, 10, {test,test_client,process_usage_test}}), halt()"
@@ -27,5 +28,4 @@ run_perf_tests: all
 
 run_distributed_tests: all
 	-killall beam.smp 2>/dev/null
-#	erl -name "testsuite@127.0.0.1" -eval "eunit:test(test_remote), halt()"
 	erl -noshell -name "testsuite@127.0.0.1" -setcookie dchat -eval "eunit:test(test_remote), halt()"
