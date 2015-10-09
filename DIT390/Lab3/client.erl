@@ -10,8 +10,36 @@ initial_state(Nick, GUIName) ->
 
 %% loop handles each kind of request from GUI
 
-%% Connect to server
+%% Connect to remote server 
+%% Usage: /connect {name,name@X.X.X.X}
+loop(St, {connect, {S, N}}) ->
+    Server = list_to_atom(S),
+    Node = list_to_atom(N),
+    case net_adm:ping(Node) of
+        pong -> 
+            case catch(genserver:request({Server,Node}, {connect, St#client_st.name, self()})) of
+                ok -> 
+                    NewServer = {Server,Node},
+                    {ok, St#client_st{server=NewServer}};
+                user_already_connected -> {{error, user_already_connected, "You are already connected."}, St};
+                server_not_reached     -> {{error, server_not_reached, "Server couldn't be reached."}, St};
+                name_taken             -> {{error, user_already_connected, "Your name is already taken."}, St};
+                {'EXIT', {badarg, _}}  -> {{error, server_not_reached, "Server couldn't be reached."}, St}
+            end;
+        pang -> 
+            {
+                {
+                    error,
+                    server_not_reached,
+                    io_lib:format("Remote server node ~p does not exist.~n",[Node])
+                },
+            St}
+    end;
+
+
+%% Connect to local server
 loop(St, {connect, Server}) ->
+    io:format("Server: ~p~n",[Server]),
     case catch(genserver:request(list_to_atom(Server), {connect, St#client_st.name, self()})) of
         ok -> {ok, St#client_st{server=list_to_atom(Server)}};
         user_already_connected -> {{error, user_already_connected, "You are already connected."}, St};
@@ -79,6 +107,7 @@ loop(St, {msg_from_GUI, Channel, Msg}) ->
         false -> {{error, user_not_joined, "You are not in that channel."}, St};
         Chan  -> 
             ChanPid = Chan#channel.pid,
+                                      %% Send directly to channel.
             case catch(genserver:request(ChanPid, {send_message, #user{name=St#client_st.name,pid=self()}, Msg})) of
                 ok                 -> {ok,St};
                 {"EXIT","Timeout"} -> {{error, timeout, "Request timed out"}, St};
@@ -120,4 +149,8 @@ loop(St, {nick, Nick}) ->
 %% Incoming message
 loop(St = #client_st { gui = GUIName }, {incoming_msg, Channel, Name, Msg}) ->
     gen_server:call(list_to_atom(GUIName), {msg_to_GUI, Channel, Name++"> "++Msg}),
-    {ok, St}.
+    {ok, St};
+
+
+loop(St, Cmd) ->
+    {{error,timeout,io_lib:format("cmd: ~p",Cmd)},St}.

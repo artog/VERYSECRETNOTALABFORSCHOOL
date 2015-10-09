@@ -13,7 +13,6 @@ initial_state(ServerName) ->
 loop(St, Message) ->
     Clients  = St#server_st.clients,
     Channels = St#server_st.channels,
-    io:format("Got message: ~p~n",[Message]),
     case Message of
         
         %% Connect, no shit?
@@ -45,7 +44,7 @@ loop(St, Message) ->
             case lists:keyfind(Channel, 2, Channels) of
                 false -> 
                     User = find_user_by_pid(Client, Clients),
-                    io:format("New channel ~p with user ~p:~p~n",[Channel,Client, User]),
+                    %% Start a channel "server"
                     Pid = genserver:start(
                         list_to_atom(Channel), 
                         #channel{
@@ -54,6 +53,7 @@ loop(St, Message) ->
                         }, 
                         fun channel_loop/2
                     ),
+                    %% Return channel pid to client and save the channel in state
                     {{ok,Pid}, St#server_st{
                         channels=[#channel{
                             name=Channel, 
@@ -64,9 +64,10 @@ loop(St, Message) ->
                 C     -> 
                     case lists:member(Client, C#channel.clients) of
                         false ->
+
                             NewClients =  [Client|C#channel.clients],
-                            io:format("~p now have clients ~p~n",[C#channel.name, NewClients]),
                             Ref = make_ref(),
+                            %% Update the channels userlist
                             C#channel.pid ! {request, self(), Ref, {update_clients, NewClients}},
                             {{ok,C#channel.pid}, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=NewClients})}};
                         true  -> {user_already_joined, St}
@@ -82,6 +83,7 @@ loop(St, Message) ->
                         true  -> 
                             NewClients =  lists:delete(Client, C#channel.clients),
                             Ref = make_ref(),
+                            %% Update the channels userlist
                             C#channel.pid ! {request, self(), Ref, {update_clients, NewClients}},
                             
                             {ok, St#server_st{channels=lists:keyreplace(Channel, 2, Channels, C#channel{clients=NewClients})}}
@@ -137,7 +139,6 @@ loop(St, Message) ->
 
 channel_loop(St, {send_message, Sender, Msg}) ->
     Channel = St#channel.name, 
-    io:format("~p sends ~p to ~p~n",[Sender#user.pid,Msg,St#channel.clients]),
     lists:foreach(fun(Pid) -> 
         case Sender#user.pid of 
             Pid -> true;
@@ -147,7 +148,6 @@ channel_loop(St, {send_message, Sender, Msg}) ->
     {ok,St};
 
 channel_loop(St, {update_clients, NewList}) ->
-    io:format("Got new client list:  ~p~n",[NewList]),
     {ok, St#channel{clients=NewList}}.
 
 %% ---------------------------------------------------------------------------
